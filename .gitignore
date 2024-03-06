@@ -2,3 +2,6 @@
 build/
 data/
 env/
+
+*.avi
+*.gif
