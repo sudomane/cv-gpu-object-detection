@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
     std::pair<int, int> dim = {width, height};
 
-    cpu::runPipeline(images, dim);
+    CPU::runPipeline(images, dim);
 
     for (const auto & image : images)
         delete[] std::get<1>(image);
