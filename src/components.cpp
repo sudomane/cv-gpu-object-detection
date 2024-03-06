@@ -1,33 +1,47 @@
 #include <img_ops.hpp>
 
 #include <iostream>
+#include <stack>
 
 static inline bool _checkBoundaries(int coord, int limit)
 {
     return (coord >= limit || coord < 0);
 }
 
-static inline void _fillLabel(unsigned char* & src, const t_point& dim, int x, int y, unsigned char label, int* count)
+static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, unsigned char label, int* count)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
 
-    if (_checkBoundaries(x, width) || _checkBoundaries(y, height))
-        return;
+    std::stack<t_point> stack;
 
-    unsigned char val = src[y * width + x];
+    stack.push({x,y});
 
-    if (val <= label)
-        return;
+    while (!stack.empty())
+    {
+        t_point position = stack.top();
+        stack.pop();
 
-    src[y * width + x] = label;
+        x = std::get<0>(position);
+        y = std::get<1>(position);
 
-    (*count)++;
+        if (_checkBoundaries(x, width) || _checkBoundaries(y, height))
+            continue;
 
-    _fillLabel(src, dim, x + 1, y, label, count);
-    _fillLabel(src, dim, x, y + 1, label, count);
-    _fillLabel(src, dim, x - 1, y, label, count);
-    _fillLabel(src, dim, x, y - 1, label, count);
+        unsigned char val = src[y * width + x];
+
+        if (val <= label)
+            continue;
+
+        src[y * width + x] = label;
+
+        (*count)++;
+
+        stack.push( {x+1, y} );
+        stack.push( {x, y+1} );
+        stack.push( {x-1, y} );
+        stack.push( {x, y-1} );
+    }
 }
 
 std::vector<std::pair<int,int>> cpu::connectedComponents(unsigned char* &src, const t_point& dim)

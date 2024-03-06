@@ -14,7 +14,8 @@ std::vector<std::string> getFiles(const std::string& path = "../data")
 
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
-        files.push_back(entry.path().string());
+        auto absolute_path = std::filesystem::absolute(entry.path().string());
+        files.push_back(absolute_path);
     }
 
     std::sort(files.begin(), files.end());
@@ -44,16 +45,10 @@ int main(int argc, char** argv)
         height = cv_image.rows;
     }
 
-    unsigned char* h_buffer = new unsigned char[width * height];
     std::pair<int, int> dim = {width, height};
 
-    cpu::runPipeline(images, h_buffer, dim);
-    cv::Mat test_image(height, width, 1, h_buffer);
-    cv::imshow("Test", test_image); // Show our image inside the created window.
-    cv::waitKey(0); // Wait for any keystroke in the window
-    cv::destroyWindow("Test"); //destroy the created window
+    cpu::runPipeline(images, dim);
 
-    delete[] h_buffer;
     for (const auto & image : images)
         delete[] std::get<1>(image);
 

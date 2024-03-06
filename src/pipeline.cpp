@@ -1,5 +1,6 @@
 #include <pipeline.hpp>
 
+#include <iostream>
 #include <chrono>
 #include <fstream>
 #include <img_ops.hpp>
@@ -34,7 +35,7 @@ static inline int _getMaxLabel(std::vector<std::pair<int,int>> histogram)
     return label;
 }
 
-static inline void _saveToJSON(json& json_data, const std::string& filename, const std::pair<t_point, t_point>& bbox_coords)
+static inline void _addToJSON(json& json_data, const std::string& filename, const std::pair<t_point, t_point>& bbox_coords)
 {
     int x_min = std::get<0>(std::get<0>(bbox_coords));
     int x_max = std::get<1>(std::get<0>(bbox_coords));
@@ -47,19 +48,24 @@ static inline void _saveToJSON(json& json_data, const std::string& filename, con
 
 static inline void _exportJSON(json& json_data)
 {
-    std::ofstream outputFile("output.json");
+    std::ofstream outputFile("bbox.json");
+    outputFile << json_data;
 }
 
-void cpu::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, unsigned char* &h_buffer, const t_point& dim)
+void cpu::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
 {
     unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
 
     int sigma       = 15;
-    int kernel_size = 17;
+    int kernel_size = 21;
     int bin_thresh  = 8;
 
-    // auto start_time = std::chrono::system_clock::now();
+    int width  = std::get<0>(dim);
+    int height = std::get<1>(dim);
+
     json json_data;
+
+    unsigned char* h_buffer = new unsigned char[width * height];
 
     for (int i = 1; i < images.size(); i++)
     {
@@ -77,15 +83,13 @@ void cpu::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
 
         const auto bbox_coords = cpu::getBbox(h_buffer, dim, max_label);
 
-        _saveToJSON(json_data, filename, bbox_coords);
-        break;
+        _addToJSON(json_data, filename, bbox_coords);
+
+        std::cout << "[CPU] : " << i << "/" << images.size()-1 << std::endl;
     }
 
     _exportJSON(json_data);
 
-    //auto end_time = std::chrono::system_clock::now();
-    //auto delta = end_time - start_time;
-    //float fps = (images.size() - 1) / delta;
-
+    delete[] h_buffer;
     delete[] ref_image;
 }
