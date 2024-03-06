@@ -21,8 +21,6 @@ target_compile_options(main PRIVATE
     $<$<CONFIG:Release>:-O3>
 )
 
-
-
 find_package(OpenCV REQUIRED)
 
 target_include_directories(main PRIVATE ${OpenCV_INCLUDE_DIRS})
