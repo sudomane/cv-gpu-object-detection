@@ -6,7 +6,7 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 ## Getting started
 
-This project uses [nlohmann JSON](https://github.com/nlohmann/json), and is included via a git submodule. To clone this repo, run the following commands:
+This project uses [nlohmann JSON](https://github.com/nlohmann/json), and is included via git submodule. To clone my project with the correct submodules, run the following commands:
 
 ```bash
 git clone git@github.com:sudomane/cv-gpu-object-detection.git
@@ -31,6 +31,8 @@ pip install -r requirements.txt
 ```
 
 ## Building C++ code
+
+This project requires OpenCV, and must be installed on your system to build the source code.
 
 To build the source code:
 ```bash
