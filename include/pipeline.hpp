@@ -7,6 +7,5 @@
 namespace cpu
 {
     void runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
-                     unsigned char* & h_buffer,
                      const std::pair<int, int> &dim);
 };
