@@ -54,8 +54,7 @@ static inline void _exportJSON(json& json_data)
 
 void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
 {
-    unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
-    unsigned char* h_buffer  = new unsigned char[width * height];
+    json json_data;
 
     int sigma       = 15;
     int kernel_size = 21;
@@ -64,8 +63,9 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
 
-    json json_data;
 
+    unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* h_buffer  = new unsigned char[width * height];
 
     for (int i = 1; i < images.size(); i++)
     {
