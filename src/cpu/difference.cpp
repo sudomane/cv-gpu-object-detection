@@ -1,7 +1,7 @@
 #include <cmath>
 #include <img_ops.hpp>
 
-void cpu::difference(unsigned char* dst, const unsigned char* src, const t_point& dim)
+void CPU::difference(unsigned char* dst, const unsigned char* src, const t_point& dim)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);

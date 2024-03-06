@@ -11,7 +11,7 @@ using json = nlohmann::json;
 static inline unsigned char* _initRef(unsigned char* ref_image, const t_point& dim)
 {
     unsigned char* ref_gray  = new unsigned char[std::get<0>(dim) * std::get<1>(dim)];
-    cpu::grayscale(ref_gray, ref_image, dim);
+    CPU::grayscale(ref_gray, ref_image, dim);
 
     return ref_gray;
 }
@@ -52,7 +52,7 @@ static inline void _exportJSON(json& json_data)
     outputFile << json_data;
 }
 
-void cpu::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
+void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
 {
     unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
 
@@ -72,16 +72,16 @@ void cpu::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         const std::string filename = std::get<0>(images[i]);
         unsigned char* image       = std::get<1>(images[i]);
 
-        cpu::grayscale (h_buffer, image, dim);
-        cpu::difference(h_buffer, ref_image, dim);
-        cpu::gaussian  (h_buffer, dim, kernel_size, sigma);
-        cpu::morphology(h_buffer, dim, kernel_size);
-        cpu::binary    (h_buffer, dim, bin_thresh);
+        CPU::grayscale (h_buffer, image, dim);
+        CPU::difference(h_buffer, ref_image, dim);
+        CPU::gaussian  (h_buffer, dim, kernel_size, sigma);
+        CPU::morphology(h_buffer, dim, kernel_size);
+        CPU::binary    (h_buffer, dim, bin_thresh);
 
-        auto histogram   = cpu::connectedComponents(h_buffer, dim);
+        auto histogram   = CPU::connectedComponents(h_buffer, dim);
         int  max_label   = _getMaxLabel(histogram);
 
-        const auto bbox_coords = cpu::getBbox(h_buffer, dim, max_label);
+        const auto bbox_coords = CPU::getBbox(h_buffer, dim, max_label);
 
         _addToJSON(json_data, filename, bbox_coords);
 

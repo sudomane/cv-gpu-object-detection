@@ -47,7 +47,7 @@ static float* generateKernel(int kernel_size, float sigma)
 
     return kernel;
 }
-void cpu::gaussian(unsigned char* & src, const t_point& dim, int kernel_size, float sigma)
+void CPU::gaussian(unsigned char* & src, const t_point& dim, int kernel_size, float sigma)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);

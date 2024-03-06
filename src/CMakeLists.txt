@@ -3,14 +3,16 @@ project(ObjDetect)
 
 set(SOURCE_FILES
     main.cpp
+    pipeline.cu
     pipeline.cpp
-    grayscale.cpp
-    difference.cpp
-    gaussian.cpp
-    morphology.cpp
-    binary.cpp
-    components.cpp
-    bbox.cpp
+
+    cpu/grayscale.cpp
+    cpu/difference.cpp
+    cpu/gaussian.cpp
+    cpu/morphology.cpp
+    cpu/binary.cpp
+    cpu/components.cpp
+    cpu/bbox.cpp
 )
 
 add_executable(main ${SOURCE_FILES})

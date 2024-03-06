@@ -64,7 +64,7 @@ static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size
     delete[] dst;
 }
 
-void cpu::morphology(unsigned char* & src, const t_point & dim, int kernel_size)
+void CPU::morphology(unsigned char* & src, const t_point & dim, int kernel_size)
 {
     // Closing
     {

@@ -5,7 +5,7 @@
 
 typedef std::pair<int,int> t_point;
 
-namespace cpu
+namespace CPU
 {
     void grayscale (unsigned char* dst,  const unsigned char* src, const t_point& dim);
     void difference(unsigned char* dst,  const unsigned char* src, const t_point& dim);

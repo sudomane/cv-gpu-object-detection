@@ -44,7 +44,7 @@ static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, u
     }
 }
 
-std::vector<std::pair<int,int>> cpu::connectedComponents(unsigned char* &src, const t_point& dim)
+std::vector<std::pair<int,int>> CPU::connectedComponents(unsigned char* &src, const t_point& dim)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);

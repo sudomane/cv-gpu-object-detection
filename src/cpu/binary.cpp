@@ -1,6 +1,6 @@
 #include <img_ops.hpp>
 
-void cpu::binary(unsigned char* &src, const t_point& dim, int bin_thresh)
+void CPU::binary(unsigned char* &src, const t_point& dim, int bin_thresh)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
