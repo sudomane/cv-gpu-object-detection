@@ -1,4 +1,5 @@
 #include <pipeline.hpp>
+#include <GPU_ops.cuh>
 
 void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
                      const std::pair<int, int> &dim)

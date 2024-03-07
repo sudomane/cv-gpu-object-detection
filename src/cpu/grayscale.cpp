@@ -1,4 +1,4 @@
-#include <img_ops.hpp>
+#include <CPU_ops.hpp>
 
 void CPU::grayscale(unsigned char* dst, const unsigned char* src, const t_point& dim)
 {

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <fstream>
-#include <img_ops.hpp>
+#include <CPU_ops.hpp>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;

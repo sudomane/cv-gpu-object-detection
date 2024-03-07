@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 ## Building C++ code
 
-This project requires OpenCV, and must be installed on your system to build the source code.
+This project requires OpenCV and CUDA, and must be installed on your system to build the source code.
 
 To build the source code:
 ```bash

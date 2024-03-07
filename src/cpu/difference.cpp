@@ -1,5 +1,6 @@
+#include <CPU_ops.hpp>
+
 #include <cmath>
-#include <img_ops.hpp>
 
 void CPU::difference(unsigned char* dst, const unsigned char* src, const t_point& dim)
 {

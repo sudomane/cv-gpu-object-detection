@@ -1,4 +1,4 @@
-#include <img_ops.hpp>
+#include <CPU_ops.hpp>
 
 #include <algorithm>
 #include <cmath>

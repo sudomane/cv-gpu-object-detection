@@ -1,4 +1,4 @@
-#include <img_ops.hpp>
+#include <CPU_ops.hpp>
 
 std::pair<t_point, t_point> CPU::getBbox(unsigned char* & src, const t_point& dim, int label)
 {

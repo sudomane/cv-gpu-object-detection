@@ -13,6 +13,8 @@ set(SOURCE_FILES
     cpu/binary.cpp
     cpu/components.cpp
     cpu/bbox.cpp
+
+    gpu/grayscale.cu
 )
 
 add_executable(main ${SOURCE_FILES})

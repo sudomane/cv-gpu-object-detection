@@ -1,4 +1,4 @@
-#include <img_ops.hpp>
+#include <CPU_ops.hpp>
 
 void CPU::binary(unsigned char* &src, const t_point& dim, int bin_thresh)
 {
