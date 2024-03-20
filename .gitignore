@@ -1,6 +1,5 @@
 .vscode/
 build/
-data/
 env/
 
 *.avi
