@@ -7,12 +7,15 @@
 
 #include <pipeline.hpp>
 
-std::vector<std::string> getFiles(const std::string& path = "../data")
+static inline std::vector<std::string> _getFiles(const std::string& path = "../data/rolling_hammer")
 {
     std::vector<std::string> files;
 
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
+        if (std::filesystem::is_directory(entry))
+            continue;
+
         auto absolute_path = std::filesystem::absolute(entry.path().string());
         files.push_back(absolute_path);
     }
@@ -22,15 +25,11 @@ std::vector<std::string> getFiles(const std::string& path = "../data")
     return files;
 }
 
-int main(int argc, char** argv)
+static inline std::vector<std::pair<std::string, unsigned char*>> _getImages(const std::vector<std::string>& files, int& width, int& height)
 {
-    std::vector<std::string> files = getFiles();
-
     std::vector<std::pair<std::string, unsigned char*>> images;
 
     images.reserve(files.size());
-
-    int height, width;
 
     for (const std::string& file : files)
     {
@@ -44,9 +43,20 @@ int main(int argc, char** argv)
         height = cv_image.rows;
     }
 
-    std::pair<int, int> dim = {width, height};
+    return images;
+}
+
+int main(int argc, char** argv)
+{
+    int height, width;
+
+    std::vector<std::string> files = _getFiles();
+    std::vector<std::pair<std::string, unsigned char*>> images = _getImages(files, height, width);
+
+    std::pair<int, int> dim = { width, height };
 
     CPU::runPipeline(images, dim);
+    //GPU::runPipeline(images, dim);
 
     for (const auto & image : images)
         delete[] std::get<1>(image);
