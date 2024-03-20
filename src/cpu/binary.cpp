@@ -9,8 +9,8 @@ void CPU::binary(unsigned char* &src, const t_point& dim, int bin_thresh)
     {
         for (int j = 0; j < height; j++)
         {
-            int pos = j * width + i;
-            src[pos] = src[pos] > bin_thresh ? 100 : 0;
+            int pos  = i * height + j;
+            src[pos] = src[pos] > bin_thresh ? 255 : 0;
         }
     }
 }

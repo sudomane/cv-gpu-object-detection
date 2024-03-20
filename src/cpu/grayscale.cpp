@@ -11,15 +11,16 @@ void CPU::grayscale(unsigned char* dst, const unsigned char* src, const t_point&
         {
             unsigned char r, g, b;
 
-            int pos = 3 * (j * width + i);
+            int pos     = i * height + j;
+            int rgb_pos = 3 * pos;
 
-            r = src[pos];
-            g = src[pos + 1];
-            b = src[pos + 2];
+            r = src[rgb_pos];
+            g = src[rgb_pos + 1];
+            b = src[rgb_pos + 2];
 
             unsigned char gray = static_cast<unsigned char>((r + g + b) / 3);
 
-            dst[j * width + i] = gray;
+            dst[pos] = gray;
         }
     }
 }

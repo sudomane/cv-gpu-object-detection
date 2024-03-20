@@ -43,7 +43,7 @@ static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size
             {
                 for (int jj = std::get<0>(jj_dim); jj < std::get<1>(jj_dim); jj++)
                 {
-                    unsigned char val = src[jj * width + ii];
+                    unsigned char val = src[ii * height + jj];
 
                     kernel.push_back(val);
                 }
@@ -55,7 +55,7 @@ static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size
             else
                 element = *(std::min_element(kernel.begin(), kernel.end()));
 
-            dst[j * width + i] = element;
+            dst[i * height + j] = element;
         }
     }
 
@@ -64,17 +64,17 @@ static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size
     delete[] dst;
 }
 
-void CPU::morphology(unsigned char* & src, const t_point & dim, int kernel_size)
+void CPU::morphology(unsigned char* & src, const t_point & dim, int opening_size, int closing_size)
 {
     // Closing
     {
-        kernelFunc(src, dim, kernel_size, true);  // Dilation
-        kernelFunc(src, dim, kernel_size, false); // Erosion
+        kernelFunc(src, dim, closing_size, true);  // Dilation
+        kernelFunc(src, dim, closing_size, false); // Erosion
     }
 
     // Opening
     {
-        kernelFunc(src, dim, kernel_size, false); // Erosion
-        kernelFunc(src, dim, kernel_size, true);  // Dilation
+        kernelFunc(src, dim, opening_size, false); // Erosion
+        kernelFunc(src, dim, opening_size, true);  // Dilation
     }
 }

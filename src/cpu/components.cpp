@@ -15,7 +15,7 @@ static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, u
 
     std::stack<t_point> stack;
 
-    stack.push({x,y});
+    stack.push( {x, y} );
 
     while (!stack.empty())
     {
@@ -28,12 +28,13 @@ static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, u
         if (_checkBoundaries(x, width) || _checkBoundaries(y, height))
             continue;
 
-        unsigned char val = src[y * width + x];
+        int pos  = x * height + y;
+        unsigned char val = src[pos];
 
         if (val <= label)
             continue;
 
-        src[y * width + x] = label;
+        src[pos] = label;
 
         (*count)++;
 
@@ -41,6 +42,11 @@ static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, u
         stack.push( {x, y+1} );
         stack.push( {x-1, y} );
         stack.push( {x, y-1} );
+
+        stack.push( {x+1, y+1} );
+        stack.push( {x-1, y+1} );
+        stack.push( {x+1, y-1} );
+        stack.push( {x-1, y-1} );
     }
 }
 
@@ -57,7 +63,7 @@ std::vector<std::pair<int,int>> CPU::connectedComponents(unsigned char* &src, co
     {
         for (int j = 0; j < height; j++)
         {
-            if (src[j * width + i] <= label)
+            if (src[i * height + j] <= label)
                 continue;
 
             label++;
