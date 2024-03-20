@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-static std::tuple<int, int> getBoundaries(int i, int kernel_size, int size)
+static inline std::tuple<int, int> _getBoundaries(int i, int kernel_size, int size)
 {
     int start = 0;
     int end   = size;
@@ -22,7 +22,7 @@ static std::tuple<int, int> getBoundaries(int i, int kernel_size, int size)
     return std::make_tuple(start, end);
 }
 
-static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size, bool is_dilation)
+static inline void _kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size, bool is_dilation)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
@@ -33,8 +33,8 @@ static void kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size
     {
         for (int j = 0; j < height; j++)
         {
-            std::tuple<int, int> ii_dim = getBoundaries(i, kernel_size, width);
-            std::tuple<int, int> jj_dim = getBoundaries(j, kernel_size, height);
+            std::tuple<int, int> ii_dim = _getBoundaries(i, kernel_size, width);
+            std::tuple<int, int> jj_dim = _getBoundaries(j, kernel_size, height);
 
             std::vector<unsigned char> kernel;
             kernel.reserve(kernel_size * kernel_size);
@@ -68,13 +68,13 @@ void CPU::morphology(unsigned char* & src, const t_point & dim, int opening_size
 {
     // Closing
     {
-        kernelFunc(src, dim, closing_size, true);  // Dilation
-        kernelFunc(src, dim, closing_size, false); // Erosion
+        _kernelFunc(src, dim, closing_size, true);  // Dilation
+        _kernelFunc(src, dim, closing_size, false); // Erosion
     }
 
     // Opening
     {
-        kernelFunc(src, dim, opening_size, false); // Erosion
-        kernelFunc(src, dim, opening_size, true);  // Dilation
+        _kernelFunc(src, dim, opening_size, false); // Erosion
+        _kernelFunc(src, dim, opening_size, true);  // Dilation
     }
 }
