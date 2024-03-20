@@ -35,11 +35,14 @@ def main(args):
 
     frames = []
 
-    for img_path, rect_shape in bbox_data.items():
+    for img_path, dim in bbox_data.items():
         img   = cv2.imread(img_path)
-        shape = (*rect_shape[0], *rect_shape[1])
 
-        cv2.rectangle(img, (shape[2], shape[3]), (shape[1], shape[0]), (0, 0, 255), 3)
+        if (dim != []):
+            top_left  = (dim[0][0], dim[1][1])
+            bot_right = (dim[0][1], dim[1][0])
+            print(f"Top left: {top_left} | Bot: {bot_right}")
+            cv2.rectangle(img, top_left, bot_right, (0, 0, 255), 3)
 
         frames.append(img)
 
