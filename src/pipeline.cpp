@@ -5,6 +5,7 @@
 #include <fstream>
 #include <CPU_ops.hpp>
 #include <nlohmann/json.hpp>
+#include <opencv2/opencv.hpp>
 
 using json = nlohmann::json;
 
@@ -37,6 +38,12 @@ static inline int _getMaxLabel(std::vector<std::pair<int,int>> histogram)
 
 static inline void _addToJSON(json& json_data, const std::string& filename, const std::pair<t_point, t_point>& bbox_coords)
 {
+    if (bbox_coords == std::pair<t_point, t_point>())
+    {
+        json_data[filename] = json::array();
+        return;
+    }
+
     int x_min = std::get<0>(std::get<0>(bbox_coords));
     int x_max = std::get<1>(std::get<0>(bbox_coords));
 
@@ -52,17 +59,31 @@ static inline void _exportJSON(json& json_data)
     outputFile << json_data;
 }
 
+static inline void _saveImage(const unsigned char* image_data, const t_point& dim, const std::string& filename)
+{
+    int width  = std::get<0>(dim);
+    int height = std::get<1>(dim);
+
+    cv::Mat image(width, height, CV_8UC1);
+    memcpy(image.data, image_data, width * height * sizeof(unsigned char));
+
+    cv::imwrite(filename, image);
+}
+
 void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
 {
     json json_data;
 
-    int sigma       = 15;
-    int kernel_size = 21;
-    int bin_thresh  = 8;
+    int sigma        = 10;
+    int kernel_size  = 21;
+    int opening_size = 21;
+    int closing_size = 21;
+
+    // implement adaptative thresholding
+    int bin_thresh   = 60;
 
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
-
 
     unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
     unsigned char* h_buffer  = new unsigned char[width * height];
@@ -75,17 +96,24 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         CPU::grayscale (h_buffer, image, dim);
         CPU::difference(h_buffer, ref_image, dim);
         CPU::gaussian  (h_buffer, dim, kernel_size, sigma);
-        CPU::morphology(h_buffer, dim, kernel_size);
+        CPU::morphology(h_buffer, dim, opening_size, closing_size);
         CPU::binary    (h_buffer, dim, bin_thresh);
 
         auto histogram   = CPU::connectedComponents(h_buffer, dim);
+
         int  max_label   = _getMaxLabel(histogram);
+
+        std::cout << "[CPU] : " << i << "/" << images.size()-1 << std::endl;
+
+        if (max_label == 0)
+        {
+            _addToJSON(json_data, filename, {});
+            continue;
+        }
 
         const auto bbox_coords = CPU::getBbox(h_buffer, dim, max_label);
 
         _addToJSON(json_data, filename, bbox_coords);
-
-        std::cout << "[CPU] : " << i << "/" << images.size()-1 << std::endl;
     }
 
     _exportJSON(json_data);
