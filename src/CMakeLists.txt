@@ -16,6 +16,7 @@ set(SOURCE_FILES
 
     gpu/grayscale.cu
     gpu/difference.cu
+    gpu/gaussian.cu
 )
 
 add_executable(main ${SOURCE_FILES})
