@@ -15,6 +15,7 @@ set(SOURCE_FILES
     cpu/bbox.cpp
 
     gpu/grayscale.cu
+    gpu/difference.cu
 )
 
 add_executable(main ${SOURCE_FILES})
