@@ -109,6 +109,7 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
 
+    int threshold     = 60;
     int sigma         = 10;
     int kernel_size   = 21;
     int kernel_offset = std::floor(kernel_size / 2);
@@ -132,6 +133,7 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_, d_buffer, d_kernel,
                                                     width, height, kernel_size,
                                                     sigma, kernel_offset);
+        GPU::binary    <<<num_blocks, block_size>>>(d_buffer_, threshold, width, height);
 
         _saveImage(d_buffer_, dim, "out" + std::to_string(i) + ".png");
 
