@@ -54,7 +54,7 @@ BM_Binary/real_time          0.080 ms        0.080 ms        10000
 # BM_Components/real_time    TODO
 # BM_BBox/real_time          TODO
 
-TOTAL_TIME                   34.27 ms        34.27 ms
+TOTAL_TIME                  164.27 ms       164.27 ms
 ```
 
 ## Getting started
