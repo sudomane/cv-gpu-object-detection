@@ -17,11 +17,12 @@ static inline T* _cudaMalloc(size_t n)
     return d_out;
 }
 
-static inline unsigned char* _toDevice(const unsigned char* h_src, int width, int height, int n_channels = 1)
+template<typename T>
+static inline T* _toDevice(const T* h_src, int width, int height, int n_channels = 1)
 {
-    unsigned char* d_dst = _cudaMalloc<unsigned char>(width * height * n_channels);
+    T* d_dst = _cudaMalloc<T>(width * height * n_channels);
 
-    int rc = cudaMemcpy(d_dst, h_src, sizeof(unsigned char) * width * height * n_channels, cudaMemcpyHostToDevice);
+    int rc = cudaMemcpy(d_dst, h_src, sizeof(T) * width * height * n_channels, cudaMemcpyHostToDevice);
     if (rc)
         errx(1, "Failed to copy host memory to device buffer.");
 
@@ -59,7 +60,7 @@ static inline unsigned char* _initRef(unsigned char* h_ref_image, const t_point&
     unsigned char* h_ref_gray  = new unsigned char[width * height];
 
     unsigned char* d_ref_gray  = _cudaMalloc<unsigned char>(width * height);
-    unsigned char* d_ref_image = _toDevice(h_ref_image, width, height, 3);
+    unsigned char* d_ref_image = _toDevice<unsigned char>(h_ref_image, width, height, 3);
 
     GPU::grayscale<<<num_blocks, block_size>>>(d_ref_gray, d_ref_image, width, height);
 
@@ -72,7 +73,6 @@ static inline float* _generateDeviceKernel(int kernel_size, float sigma)
 {
     float  sum = 0;
     float* h_kernel = new float[kernel_size * kernel_size];
-    float* d_kernel = _cudaMalloc<float>(kernel_size * kernel_size);
 
     for (int i = 0; i < kernel_size; i++)
     {
@@ -96,7 +96,7 @@ static inline float* _generateDeviceKernel(int kernel_size, float sigma)
         }
     }
 
-    cudaMemcpy(d_kernel, h_kernel, kernel_size * kernel_size * sizeof(float), cudaMemcpyHostToDevice);
+    float* d_kernel = _toDevice<float>(h_kernel, kernel_size, kernel_size);
 
     delete[] h_kernel;
 
@@ -120,15 +120,15 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int block_size = 256;
     int num_blocks = (width * height + block_size - 1) / block_size;
 
-    unsigned char* d_ref     = _initRef(std::get<1>(images[0]), dim);
-    unsigned char* d_buffer  = _cudaMalloc<unsigned char>(width * height);
-    unsigned char* d_buffer_ = _cudaMalloc<unsigned char>(width * height);
+    unsigned char* d_ref        = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height);
+    unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
 
     for (int i = 1; i < images.size(); i++)
     {
         const std::string filename = std::get<0>(images[i]);
         unsigned char* h_image     = std::get<1>(images[i]);
-        unsigned char* d_image     = _toDevice(h_image, width, height, 3);
+        unsigned char* d_image     = _toDevice<unsigned char>(h_image, width, height, 3);
 
         GPU::grayscale <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
         GPU::difference<<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
