@@ -1,33 +1,8 @@
 #include <pipeline.hpp>
 
-#include <err.h>
 #include <cmath>
 #include <GPU_ops.cuh>
 #include <opencv2/opencv.hpp>
-
-template<typename T>
-static inline T* _cudaMalloc(size_t n)
-{
-    T* d_out;
-
-    int rc = cudaMalloc(&d_out, sizeof(T) * n);
-    if (rc)
-      errx(1, "Failed to allocate d_out.");
-
-    return d_out;
-}
-
-template<typename T>
-static inline T* _toDevice(const T* h_src, int width, int height, int n_channels = 1)
-{
-    T* d_dst = _cudaMalloc<T>(width * height * n_channels);
-
-    int rc = cudaMemcpy(d_dst, h_src, sizeof(T) * width * height * n_channels, cudaMemcpyHostToDevice);
-    if (rc)
-        errx(1, "Failed to copy host memory to device buffer.");
-
-    return d_dst;
-}
 
 static inline void _saveImage(const unsigned char* d_image_data, const t_point& dim, const std::string& filename)
 {
@@ -69,57 +44,23 @@ static inline unsigned char* _initRef(unsigned char* h_ref_image, const t_point&
     return d_ref_gray;
 }
 
-static inline float* _generateDeviceKernel(int kernel_size, float sigma)
-{
-    float  sum = 0;
-    float* h_kernel = new float[kernel_size * kernel_size];
-
-    for (int i = 0; i < kernel_size; i++)
-    {
-        for (int j = 0; j < kernel_size; j++)
-        {
-            float x = i - kernel_size / 2;
-            float y = j - kernel_size / 2;
-
-            float val = std::exp2f(-(x*x + y*y) / (2 * sigma * sigma)) / (2 * M_PI * sigma * sigma);
-            h_kernel[j * kernel_size + i] = val;
-
-            sum += val;
-        }
-    }
-
-    for (int i = 0; i < kernel_size; i++)
-    {
-        for (int j = 0; j < kernel_size; j++)
-        {
-            h_kernel[j * kernel_size + i] /= sum;
-        }
-    }
-
-    float* d_kernel = _toDevice<float>(h_kernel, kernel_size, kernel_size);
-
-    delete[] h_kernel;
-
-    return d_kernel;
-}
-
 void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
                      const std::pair<int, int> &dim)
 {
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
 
-    int threshold     = 60;
+    int threshold     = 60; // TODO: Implement adaptative thresholding
     int sigma         = 10;
     int kernel_size   = 21;
     int opening_size  = 21;
     int closing_size  = 21;
     int kernel_offset = std::floor(kernel_size / 2);
-    float* d_kernel   = _generateDeviceKernel(kernel_size, sigma);
 
     int block_size = 256;
     int num_blocks = (width * height + block_size - 1) / block_size;
 
+    float* d_kernel             = _generateDeviceKernel(kernel_size, sigma);
     unsigned char* d_ref        = _initRef(std::get<1>(images[0]), dim);
     unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
@@ -132,11 +73,8 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
 
         GPU::grayscale <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
         GPU::difference<<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
-        GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel,
-                                                    width, height, kernel_size,
-                                                    sigma, kernel_offset);
-        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, width, height,
-                                                    opening_size, closing_size, kernel_offset);
+        GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel, width, height, kernel_size, kernel_offset);
+        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, width, height, opening_size, closing_size, kernel_offset);
         GPU::binary    <<<num_blocks, block_size>>>(d_buffer_tmp, threshold, width, height);
 
         _saveImage(d_buffer_tmp, dim, "out" + std::to_string(i) + ".png");
