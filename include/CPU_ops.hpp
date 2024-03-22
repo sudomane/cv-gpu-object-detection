@@ -1,9 +1,26 @@
 #pragma once
 
+#include <cmath>
 #include <tuple>
 #include <vector>
 
 typedef std::pair<int,int> t_point;
+
+inline std::tuple<int, int> _getBoundaries(int i, int kernel_size, int size)
+{
+    int start = 0;
+    int end   = size;
+
+    int kernel_size_ = std::floor(kernel_size/2);
+
+    if (i > kernel_size_)
+        start = i - kernel_size_;
+
+    if (i + kernel_size_ < size)
+        end = i + kernel_size_ + 1;
+
+    return std::make_tuple(start, end);
+}
 
 namespace CPU
 {
