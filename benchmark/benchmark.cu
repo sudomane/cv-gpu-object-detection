@@ -85,8 +85,28 @@ static void BM_Gaussian(benchmark::State& state)
     cudaFree(d_kernel);
 }
 
+static void BM_Binary(benchmark::State& state)
+{
+    int threshold = 21;
+
+    unsigned char* h_src = new unsigned char[width * height];
+    unsigned char* d_src = _toDevice(h_src, width, height);
+
+    for (auto _ : state)
+    {
+        GPU::binary<<<num_blocks, block_size>>>(d_src, threshold, width, height);
+    }
+
+    cudaDeviceSynchronize(); // Wait for GPU to finish
+
+    delete[] h_src;
+
+    cudaFree(d_src);
+}
+
 BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Binary)    ->Unit(benchmark::kMillisecond)->UseRealTime();
 
 BENCHMARK_MAIN();
