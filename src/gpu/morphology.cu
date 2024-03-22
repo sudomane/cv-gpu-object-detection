@@ -37,7 +37,7 @@ __device__ void _kernelFunc(unsigned char* d_dst, const unsigned char* d_src, in
     d_dst[x * height + y] = tmp;
 }
 
-__global__ void GPU::morphology (unsigned char* d_dst, unsigned char* d_src, int width, int height, int opening_size, int closing_size, int offset)
+__global__ void GPU::morphology (unsigned char* d_dst, unsigned char* d_src, unsigned char* d_buf, int width, int height, int opening_size, int closing_size, int opening_offset, int closing_offset)
 {
     int dim = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -51,13 +51,13 @@ __global__ void GPU::morphology (unsigned char* d_dst, unsigned char* d_src, int
 
     // Closing
     {
-        _kernelFunc(d_dst, d_src, dim, width, height, opening_size, offset, true);  // Dilation
-        _kernelFunc(d_src, d_dst, dim, width, height, opening_size, offset, false); // Erosion
+        _kernelFunc(d_buf, d_src, dim, width, height, closing_size, closing_offset, true);  // Dilation
+        _kernelFunc(d_dst, d_buf, dim, width, height, closing_size, closing_offset, false); // Erosion
     }
 
     // Opening
     {
-        //_kernelFunc(d_dst, d_src, dim, width, height, opening_size, offset, false); // Erosion
-        //_kernelFunc(d_src, d_dst, dim, width, height, opening_size, offset, true);  // Dilation
+        _kernelFunc(d_src, d_buf, dim, width, height, opening_size, opening_offset, false); // Erosion
+        _kernelFunc(d_dst, d_src, dim, width, height, opening_size, opening_offset, true);  // Dilation
     }
 }
