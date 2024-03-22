@@ -112,15 +112,17 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int threshold     = 60;
     int sigma         = 10;
     int kernel_size   = 21;
+    int opening_size  = 21;
+    int closing_size  = 21;
     int kernel_offset = std::floor(kernel_size / 2);
     float* d_kernel   = _generateDeviceKernel(kernel_size, sigma);
 
     int block_size = 256;
     int num_blocks = (width * height + block_size - 1) / block_size;
 
-    unsigned char* d_ref     = _initRef(std::get<1>(images[0]), dim);
-    unsigned char* d_buffer  = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
-    unsigned char* d_buffer_ = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
+    unsigned char* d_ref        = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
+    unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
 
     for (int i = 1; i < images.size(); i++)
     {
@@ -130,12 +132,14 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
 
         GPU::grayscale <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
         GPU::difference<<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
-        GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_, d_buffer, d_kernel,
+        GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel,
                                                     width, height, kernel_size,
                                                     sigma, kernel_offset);
-        GPU::binary    <<<num_blocks, block_size>>>(d_buffer_, threshold, width, height);
+        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, width, height,
+                                                    opening_size, closing_size, kernel_offset);
+        GPU::binary    <<<num_blocks, block_size>>>(d_buffer_tmp, threshold, width, height);
 
-        _saveImage(d_buffer_, dim, "out" + std::to_string(i) + ".png");
+        _saveImage(d_buffer_tmp, dim, "out" + std::to_string(i) + ".png");
 
         std::cout << "[GPU] : " << i << "/" << images.size()-1 << std::endl;
 
@@ -143,7 +147,7 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     }
 
     cudaFree(d_buffer);
-    cudaFree(d_buffer_);
+    cudaFree(d_buffer_tmp);
     cudaFree(d_ref);
     cudaFree(d_kernel);
 }
