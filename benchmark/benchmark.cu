@@ -85,8 +85,8 @@ static void BM_Gaussian(benchmark::State& state)
     cudaFree(d_kernel);
 }
 
-BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime()->Iterations(1000);
-BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime()->Iterations(1000);
-BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime()->Iterations(1000);
+BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime();
 
 BENCHMARK_MAIN();

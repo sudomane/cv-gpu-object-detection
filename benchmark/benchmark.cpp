@@ -5,7 +5,7 @@
 static int width  = 1920;
 static int height = 1080;
 
-static void BM_GrayScale(benchmark::State& state)
+static void BM_Grayscale(benchmark::State& state)
 {
     unsigned char* src = new unsigned char[width * height * 3];
     unsigned char* dst = new unsigned char[width * height];
@@ -141,7 +141,7 @@ static void BM_BBox(benchmark::State& state)
     delete[] src;
 }
 
-BENCHMARK(BM_GrayScale) ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Morphology)->Unit(benchmark::kMillisecond)->UseRealTime();
