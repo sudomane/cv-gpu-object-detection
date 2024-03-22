@@ -17,7 +17,10 @@ set(SOURCE_FILES
     gpu/grayscale.cu
     gpu/difference.cu
     gpu/gaussian.cu
+    gpu/morphology.cu
     gpu/binary.cu
+    gpu/components.cu
+    gpu/bbox.cu
 )
 
 add_executable(main ${SOURCE_FILES})
@@ -33,8 +36,6 @@ find_package(OpenCV REQUIRED)
 target_include_directories(main PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ext/json/include)
-
-target_link_libraries(main PRIVATE ${OpenCV_LIBS})
 
 enable_language(CUDA)
 
