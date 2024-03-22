@@ -19,6 +19,8 @@ Here are the benchmarks on individual  that I have obtained with my CPU vs GPU i
 |Binary      | 1.150 ms | 0.080 ms | 93 %        |
 |Components  | 1.690 ms |          |             |
 |Bounding box| 1.290 ms |          |             |
+|            |          |          |             |
+| Total Time | 6539.9 ms|          |             |
 
 Below are the full benchmark details.
 ### CPU
