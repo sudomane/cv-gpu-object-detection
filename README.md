@@ -15,7 +15,7 @@ Here are the benchmarks on individual  that I have obtained with my CPU vs GPU i
 |Grayscale   | 1.650 ms | 0.088 ms | 95 %        |
 |Difference  | 0.213 ms | 0.079 ms | 63 %        |
 |Gaussian    | 854 ms   | 34 ms    | 96 %        |
-|Morphology  | 5680 ms  |          |             |
+|Morphology  | 5680 ms  | 130 ms   | 97 %        |
 |Binary      | 1.150 ms | 0.080 ms | 93 %        |
 |Components  | 1.690 ms |          |             |
 |Bounding box| 1.290 ms |          |             |
@@ -49,7 +49,7 @@ Benchmark                        Time             CPU   Iterations
 BM_Grayscale/real_time       0.088 ms        0.088 ms        10000
 BM_Difference/real_time      0.079 ms        0.079 ms        10000
 BM_Gaussian/real_time         34.0 ms         34.0 ms        10000
-# BM_Morphology/real_time    TODO
+BM_Morphology/real_time        130 ms          130 ms        10000
 BM_Binary/real_time          0.080 ms        0.080 ms        10000
 # BM_Components/real_time    TODO
 # BM_BBox/real_time          TODO
