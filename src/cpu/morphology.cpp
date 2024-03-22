@@ -1,26 +1,9 @@
 #include <CPU_ops.hpp>
 
 #include <algorithm>
-#include <cmath>
 #include <functional>
 
 #include <iostream>
-
-static inline std::tuple<int, int> _getBoundaries(int i, int kernel_size, int size)
-{
-    int start = 0;
-    int end   = size;
-
-    int kernel_size_ = std::floor(kernel_size/2);
-
-    if (i > kernel_size_)
-        start = i - kernel_size_;
-
-    if (i + kernel_size_ < size)
-        end = i + kernel_size_ + 1;
-
-    return std::make_tuple(start, end);
-}
 
 static inline void _kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size, bool is_dilation)
 {
