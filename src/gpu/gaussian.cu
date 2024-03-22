@@ -1,6 +1,6 @@
 #include <GPU_ops.cuh>
 
-__global__ void GPU::gaussian(unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel, int width, int height, int kernel_size, int sigma, int offset)
+__global__ void GPU::gaussian(unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel, int width, int height, int kernel_size, int offset)
 {
     int dim = blockDim.x * blockIdx.x + threadIdx.x;
 
