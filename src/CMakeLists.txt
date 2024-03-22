@@ -37,6 +37,8 @@ target_include_directories(main PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ext/json/include)
 
+target_link_libraries(main PRIVATE ${OpenCV_LIBS})
+
 enable_language(CUDA)
 
 set_property(TARGET main PROPERTY CXX_STANDARD 20)
