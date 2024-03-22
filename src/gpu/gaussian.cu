@@ -1,20 +1,5 @@
 #include <GPU_ops.cuh>
 
-__device__ void _getBoundaries(int i, int kernel_size, int size, int offset, int& start, int& end)
-{
-    int _start = 0;
-    int _end   = size;
-
-    if (i > offset)
-        _start = i - offset;
-
-    if (i + offset < size)
-        _end = i + offset + 1;
-
-    start = _start;
-    end   = _end;
-}
-
 __global__ void GPU::gaussian(unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel, int width, int height, int kernel_size, int sigma, int offset)
 {
     int dim = blockDim.x * blockIdx.x + threadIdx.x;
@@ -28,8 +13,8 @@ __global__ void GPU::gaussian(unsigned char* d_dst, const unsigned char* d_src, 
     int ii_start, ii_end;
     int jj_start, jj_end;
 
-    _getBoundaries(x, kernel_size, width,  offset, ii_start, ii_end);
-    _getBoundaries(y, kernel_size, height, offset, jj_start, jj_end);
+    _getDeviceBoundaries(x, kernel_size, width,  offset, ii_start, ii_end);
+    _getDeviceBoundaries(y, kernel_size, height, offset, jj_start, jj_end);
 
     float val = 0;
 

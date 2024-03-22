@@ -1,23 +1,6 @@
 #include <CPU_ops.hpp>
 
-#include <cmath>
 #include <memory>
-
-static inline std::tuple<int, int> _getBoundaries(int i, int kernel_size, int size)
-{
-    int start = 0;
-    int end   = size;
-
-    int offset = std::floor(kernel_size/2);
-
-    if (i > offset)
-        start = i - offset;
-
-    if (i + offset < size)
-        end = i + offset + 1;
-
-    return std::make_tuple(start, end);
-}
 
 static inline float* _generateKernel(int kernel_size, float sigma)
 {
