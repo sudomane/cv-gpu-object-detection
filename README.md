@@ -11,35 +11,98 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 This project uses [nlohmann JSON](https://github.com/nlohmann/json), and is included via git submodule. To clone my project with the correct submodules, run the following commands:
 
 ```bash
-git clone git@github.com:sudomane/cv-gpu-object-detection.git
-cd cv-gpu-object-detection
-git submodule init   # Create submodule configuration file
-git submodule update # Fetch submodule data
+$ git clone --recurse-submodules git@github.com:sudomane/cv-gpu-object-detection.git
 ```
 
 Or alternatively,
 
 ```bash
-git clone --recurse-submodules git@github.com:sudomane/cv-gpu-object-detection.git
+$git clone git@github.com:sudomane/cv-gpu-object-detection.git
+$cd cv-gpu-object-detection
+$git submodule init   # Create submodule configuration file
+$git submodule update # Fetch submodule data
 ```
 
 ## Setting up the Python Environment
 
+A Python environment will be necessary to run the render script to generate a video from the bounding box results from the object detection pipeline.
 To create the python environment:
+
 ```bash
-python -m venv env
-source env/bin/activate
-pip install -r requirements.txt
+$ python -m venv env
+$ source env/bin/activate
+$ pip install -r requirements.txt
 ```
 
 ## Building C++ code
 
-This project requires OpenCV and CUDA, and must be installed on your system to build the source code.
+This project requires OpenCV and CUDA, and must be installed on your system to build the source code. To build the source code:
 
-To build the source code:
 ```bash
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
+$ make main
+```
+
+## Running the code
+
+To execute the program, from within the build folder:
+
+```bash
+$ ./src/main
+```
+
+Once completed, a JSON file containing the bounding box coordinates for each frame will be outputted in the build directory, with the file name: `bbox.json`.
+
+To render a video of the frames, with the bounding box coordinates, run the `render.py` script found at the root of this project.
+
+```bash
+$ python3 render.py --output_filename FILENAME --json_path PATH --fps FPS
+```
+
+## Running benchmarks
+
+Within your build folder, run the following commands:
+
+```bash
+$ make bench     # CPU Benchmarks
+$ make bench_gpu # GPU Benchmarks
+```
+
+To execute the benchmarks, from within the build folder:
+
+```bash
+$ ./benchmark/bench     # CPU Benchmarks
+$ ./benchmark/bench_gpu # GPU Benchmarks
+```
+
+## Benchmarks
+
+Here are the benchmarks that I have obtained with my CPU vs GPU implementation
+
+### CPU
+
+```bash
+------------------------------------------------------------------
+Benchmark                        Time             CPU   Iterations
+------------------------------------------------------------------
+BM_Grayscale/real_time        1.65 ms         1.63 ms          424
+BM_Difference/real_time      0.213 ms        0.210 ms         3002
+BM_Gaussian/real_time          854 ms          850 ms            1
+BM_Morphology/real_time       5680 ms         5680 ms            1
+BM_Binary/real_time           1.15 ms         1.15 ms          609
+BM_Components/real_time       1.69 ms         1.69 ms          331
+BM_BBox/real_time             1.29 ms         1.29 ms          539
+```
+
+### GPU
+
+```bash
+------------------------------------------------------------------
+Benchmark                        Time             CPU   Iterations
+------------------------------------------------------------------
+BM_Grayscale/real_time       0.088 ms        0.088 ms        10000
+BM_Difference/real_time      0.079 ms        0.079 ms        10000
+
 ```
