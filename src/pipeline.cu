@@ -120,9 +120,9 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int block_size = 256;
     int num_blocks = (width * height + block_size - 1) / block_size;
 
-    unsigned char* d_ref        = _initRef(std::get<1>(images[0]), dim);
-    unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
-    unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height * sizeof(unsigned char));
+    unsigned char* d_ref     = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* d_buffer  = _cudaMalloc<unsigned char>(width * height);
+    unsigned char* d_buffer_ = _cudaMalloc<unsigned char>(width * height);
 
     for (int i = 1; i < images.size(); i++)
     {
