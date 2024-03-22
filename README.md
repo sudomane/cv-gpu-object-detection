@@ -6,6 +6,55 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 <img src="data/rolling_hammer.gif"/>
 
+## Benchmarks
+
+Here are the benchmarks on individual  that I have obtained with my CPU vs GPU implementation.
+
+|            | CPU Time | GPU Time | % Speed Up  |
+|------------|----------|----------|-------------|
+|Grayscale   | 1.650 ms | 0.088 ms | 95 %        |
+|Difference  | 0.213 ms | 0.079 ms | 63 %        |
+|Gaussian    | 854 ms   | 34 ms    | 96 %        |
+|Morphology  | 5680 ms  |          |             |
+|Binary      | 1.150 ms | 0.080 ms | 93 %        |
+|Components  | 1.690 ms |          |             |
+|Bounding box| 1.290 ms |          |             |
+
+Below are the full benchmark details.
+### CPU
+
+```bash
+------------------------------------------------------------------
+Benchmark                        Time             CPU   Iterations
+------------------------------------------------------------------
+BM_Grayscale/real_time        1.65 ms         1.63 ms          424
+BM_Difference/real_time      0.213 ms        0.210 ms         3002
+BM_Gaussian/real_time          854 ms          850 ms            1
+BM_Morphology/real_time       5680 ms         5680 ms            1
+BM_Binary/real_time           1.15 ms         1.15 ms          609
+BM_Components/real_time       1.69 ms         1.69 ms          331
+BM_BBox/real_time             1.29 ms         1.29 ms          539
+
+TOTAL_TIME                  6539.9 ms       6535.9 ms
+```
+
+### GPU
+
+```bash
+------------------------------------------------------------------
+Benchmark                        Time             CPU   Iterations
+------------------------------------------------------------------
+BM_Grayscale/real_time       0.088 ms        0.088 ms        10000
+BM_Difference/real_time      0.079 ms        0.079 ms        10000
+BM_Gaussian/real_time         34.0 ms         34.0 ms        10000
+# BM_Morphology/real_time    TODO
+BM_Binary/real_time          0.080 ms        0.080 ms        10000
+# BM_Components/real_time    TODO
+# BM_BBox/real_time          TODO
+
+TOTAL_TIME                   34.27 ms        34.27 ms
+```
+
 ## Getting started
 
 This project uses [nlohmann JSON](https://github.com/nlohmann/json), and is included via git submodule. To clone my project with the correct submodules, run the following commands:
@@ -75,34 +124,4 @@ To execute the benchmarks, from within the build folder:
 ```bash
 $ ./benchmark/bench     # CPU Benchmarks
 $ ./benchmark/bench_gpu # GPU Benchmarks
-```
-
-## Benchmarks
-
-Here are the benchmarks that I have obtained with my CPU vs GPU implementation
-
-### CPU
-
-```bash
-------------------------------------------------------------------
-Benchmark                        Time             CPU   Iterations
-------------------------------------------------------------------
-BM_Grayscale/real_time        1.65 ms         1.63 ms          424
-BM_Difference/real_time      0.213 ms        0.210 ms         3002
-BM_Gaussian/real_time          854 ms          850 ms            1
-BM_Morphology/real_time       5680 ms         5680 ms            1
-BM_Binary/real_time           1.15 ms         1.15 ms          609
-BM_Components/real_time       1.69 ms         1.69 ms          331
-BM_BBox/real_time             1.29 ms         1.29 ms          539
-```
-
-### GPU
-
-```bash
-------------------------------------------------------------------
-Benchmark                        Time             CPU   Iterations
-------------------------------------------------------------------
-BM_Grayscale/real_time       0.088 ms        0.088 ms        10000
-BM_Difference/real_time      0.079 ms        0.079 ms        10000
-
 ```
