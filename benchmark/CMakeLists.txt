@@ -7,7 +7,7 @@ find_package(benchmark REQUIRED)
 
 add_executable(bench
     benchmark.cpp
-
+    utils.hpp
     ../src/cpu/grayscale.cpp
     ../src/cpu/difference.cpp
     ../src/cpu/gaussian.cpp
@@ -17,8 +17,9 @@ add_executable(bench
     ../src/cpu/bbox.cpp
 )
 
-target_include_directories(bench PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_include_directories(bench PRIVATE ${OpenCV_INCLUDE_DIRS} .)
 target_include_directories(bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+target_include_directories(bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ext/json/include)
 target_link_libraries(bench PRIVATE ${OpenCV_LIBS} benchmark::benchmark)
 
 set_property(TARGET bench PROPERTY CXX_STANDARD 20)
@@ -29,7 +30,7 @@ enable_language(CUDA)
 
 add_executable(bench_gpu
     benchmark.cu
-
+    utils.hpp
     ../src/gpu/grayscale.cu
     ../src/gpu/difference.cu
     ../src/gpu/gaussian.cu
@@ -39,8 +40,10 @@ add_executable(bench_gpu
     ../src/gpu/bbox.cu
 )
 
-target_include_directories(bench_gpu PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_include_directories(bench_gpu PRIVATE ${OpenCV_INCLUDE_DIRS} .)
 target_include_directories(bench_gpu PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+target_include_directories(bench_gpu PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ext/json/include)
+
 target_link_libraries(bench_gpu PRIVATE ${OpenCV_LIBS} benchmark::benchmark)
 
 set_property(TARGET bench_gpu PROPERTY CXX_STANDARD 20)

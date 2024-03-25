@@ -1,6 +1,9 @@
 #include <benchmark/benchmark.h>
 
 #include <CPU_ops.hpp>
+#include <utils.hpp>
+
+json config = _loadConfig();
 
 static int width  = 1920;
 static int height = 1080;
@@ -35,8 +38,8 @@ static void BM_Difference(benchmark::State& state)
 
 static void BM_Gaussian(benchmark::State& state)
 {
-    int sigma = 10;
-    int kernel_size = 21;
+    int sigma = config["sigma"];
+    int kernel_size = config["kernel_size"];
 
     unsigned char* src = new unsigned char[width * height];
 
@@ -50,9 +53,8 @@ static void BM_Gaussian(benchmark::State& state)
 
 static void BM_Morphology(benchmark::State& state)
 {
-    int sigma = 10;
-    int opening_size = 21;
-    int closing_size = 21;
+    int opening_size = config["opening_size"];
+    int closing_size = config["closing_size"];
 
     unsigned char* src = new unsigned char[width * height];
 
@@ -66,7 +68,7 @@ static void BM_Morphology(benchmark::State& state)
 
 static void BM_Binary(benchmark::State& state)
 {
-    int threshold = 21;
+    int threshold = config["threshold"];
 
     unsigned char* src = new unsigned char[width * height];
 

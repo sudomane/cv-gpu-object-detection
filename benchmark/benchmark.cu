@@ -3,12 +3,15 @@
 #include <GPU_ops.cuh>
 
 #include <cmath>
+#include <utils.hpp>
 
 static int width  = 1920;
 static int height = 1080;
 
 int block_size = 256;
 int num_blocks = (width * height + block_size - 1) / block_size;
+
+json config = _loadConfig();
 
 static void BM_Grayscale(benchmark::State& state)
 {
@@ -44,8 +47,8 @@ static void BM_Difference(benchmark::State& state)
 
 static void BM_Gaussian(benchmark::State& state)
 {
-    int sigma = 10;
-    int kernel_size   = 21;
+    int sigma = config["sigma"];
+    int kernel_size   = config["kernel_size"];
     int kernel_offset = std::floor(kernel_size/2);
 
     unsigned char* d_src = _cudaMalloc<unsigned char>(width * height);
@@ -67,7 +70,7 @@ static void BM_Gaussian(benchmark::State& state)
 
 static void BM_Binary(benchmark::State& state)
 {
-    int threshold = 21;
+    int threshold = config["threshold"];
 
     unsigned char* d_src = _cudaMalloc<unsigned char>(width * height);
 
@@ -83,8 +86,8 @@ static void BM_Binary(benchmark::State& state)
 
 static void BM_Morphology(benchmark::State& state)
 {
-    int opening_size = 21;
-    int closing_size = 21;
+    int opening_size = config["opening_size"];
+    int closing_size = config["closing_size"];
     int opening_offset = std::floor(opening_size / 2);
     int closing_offset = std::floor(closing_size / 2);
 
@@ -104,10 +107,10 @@ static void BM_Morphology(benchmark::State& state)
     cudaFree(d_buf);
 }
 
-//BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime();
-//BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime();
-//BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Grayscale) ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Difference)->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Gaussian)  ->Unit(benchmark::kMillisecond)->UseRealTime();
 BENCHMARK(BM_Morphology)->Unit(benchmark::kMillisecond)->UseRealTime();
-//BENCHMARK(BM_Binary)    ->Unit(benchmark::kMillisecond)->UseRealTime();
+BENCHMARK(BM_Binary)    ->Unit(benchmark::kMillisecond)->UseRealTime();
 
 BENCHMARK_MAIN();
