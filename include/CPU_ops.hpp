@@ -26,11 +26,11 @@ namespace CPU
 {
     void grayscale (unsigned char* dst,  const unsigned char* src, int width, int height);
     void difference(unsigned char* dst,  const unsigned char* src, int width, int height);
-    void gaussian  (unsigned char* & src, int width, int height, int kernel_size, float sigma);
-    void morphology(unsigned char* & src, int width, int height, int opening_size, int closing_size);
-    void binary    (unsigned char* & src, int width, int height, int bin_thresh);
+    void gaussian  (unsigned char* & data, int width, int height, int kernel_size, float sigma);
+    void morphology(unsigned char* & data, int width, int height, int opening_size, int closing_size);
+    void binary    (unsigned char* & data, int width, int height, int bin_thresh);
 
-    std::vector<t_point> connectedComponents(unsigned char* & src, int width, int height);
-    std::pair<t_point, t_point> getBbox(unsigned char* & src, int width, int height, int label);
+    std::vector<t_point> connectedComponents(unsigned char* & data, int width, int height);
+    std::pair<t_point, t_point> getBbox(unsigned char* & data, int width, int height, int label);
 
 }; // namespace cpu

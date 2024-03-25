@@ -60,7 +60,8 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     unsigned char* d_ref        = _initRef(std::get<1>(images[0]), width, height);
     unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
-    unsigned char* d_buffer_    = _cudaMalloc<unsigned char>(width * height);
+    unsigned char* d_buffer_alt = _cudaMalloc<unsigned char>(width * height); // Additional temporary buffer
+    unsigned char* d_CC_labels  = _cudaMalloc<unsigned char>(width * height); // Buffer for connected component labels
 
     for (int i = 1; i < images.size(); i++)
     {
@@ -71,9 +72,11 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         GPU::grayscale <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
         GPU::difference<<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
         GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel, width, height, kernel_size, kernel_offset);
-        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, d_buffer_, width, height, opening_size, closing_size, opening_offset, closing_offset);
+        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, d_buffer_alt, width, height, opening_size, closing_size, opening_offset, closing_offset);
         GPU::binary    <<<num_blocks, block_size>>>(d_buffer, bin_thresh, width, height);
-        GPU::components<<<num_blocks, block_size>>>(d_buffer, width, height);
+        GPU::components<<<num_blocks, block_size>>>(d_buffer, d_CC_labels, width, height);
+
+        _saveImage(d_buffer, width, height, "out.png");
 
         std::cout << "Processed frame " << i << " of " << images.size()-1 << std::endl;
 
@@ -84,9 +87,11 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
 
     _exportJSON(bbox_JSON_data, bbox_output);
 
+    cudaFree(d_ref);
+    cudaFree(d_kernel);
+
     cudaFree(d_buffer);
     cudaFree(d_buffer_tmp);
-    cudaFree(d_ref);
-    cudaFree(d_buffer_);
-    cudaFree(d_kernel);
+    cudaFree(d_buffer_alt);
+    cudaFree(d_CC_labels);
 }

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-std::pair<t_point, t_point> CPU::getBbox(unsigned char* & src, int width, int height, int label)
+std::pair<t_point, t_point> CPU::getBbox(unsigned char* & data, int width, int height, int label)
 {
     int top = height;
     int bot = 0;
@@ -16,7 +16,7 @@ std::pair<t_point, t_point> CPU::getBbox(unsigned char* & src, int width, int he
         for (int j = 0; j < height; j++)
         {
             int pos = i * height + j;
-            int val = src[pos];
+            int val = data[pos];
 
             if (val != label)
                 continue;

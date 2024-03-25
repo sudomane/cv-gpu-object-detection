@@ -5,9 +5,9 @@
 
 #include <iostream>
 
-static inline void _kernelFunc(unsigned char* & src, int width, int height, int kernel_size, bool is_dilation)
+static inline void _kernelFunc(unsigned char* & data, int width, int height, int kernel_size, bool is_dilation)
 {
-    unsigned char * dst = new unsigned char[width * height];
+    unsigned char * tmp_data = new unsigned char[width * height];
 
     for (int i = 0; i < width; i++)
     {
@@ -23,7 +23,7 @@ static inline void _kernelFunc(unsigned char* & src, int width, int height, int 
             {
                 for (int jj = std::get<0>(jj_dim); jj < std::get<1>(jj_dim); jj++)
                 {
-                    unsigned char val = src[ii * height + jj];
+                    unsigned char val = data[ii * height + jj];
 
                     kernel.push_back(val);
                 }
@@ -35,26 +35,26 @@ static inline void _kernelFunc(unsigned char* & src, int width, int height, int 
             else
                 element = *(std::min_element(kernel.begin(), kernel.end()));
 
-            dst[i * height + j] = element;
+            tmp_data[i * height + j] = element;
         }
     }
 
-    std::swap(src, dst);
+    std::swap(data, tmp_data);
 
-    delete[] dst;
+    delete[] tmp_data;
 }
 
-void CPU::morphology(unsigned char* & src, int width, int height, int opening_size, int closing_size)
+void CPU::morphology(unsigned char* & data, int width, int height, int opening_size, int closing_size)
 {
     // Closing
     {
-        _kernelFunc(src, width, height, closing_size, true);  // Dilation
-        _kernelFunc(src, width, height, closing_size, false); // Erosion
+        _kernelFunc(data, width, height, closing_size, true);  // Dilation
+        _kernelFunc(data, width, height, closing_size, false); // Erosion
     }
 
     // Opening
     {
-        _kernelFunc(src, width, height, opening_size, false); // Erosion
-        _kernelFunc(src, width, height, opening_size, true);  // Dilation
+        _kernelFunc(data, width, height, opening_size, false); // Erosion
+        _kernelFunc(data, width, height, opening_size, true);  // Dilation
     }
 }

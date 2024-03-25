@@ -1,6 +1,6 @@
 #include <GPU_ops.cuh>
 
-__global__ void GPU::binary(unsigned char* d_dst, int bin_thresh, int width, int height)
+__global__ void GPU::binary(unsigned char* d_data, int bin_thresh, int width, int height)
 {
     int dim = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -10,5 +10,5 @@ __global__ void GPU::binary(unsigned char* d_dst, int bin_thresh, int width, int
     if (x >= width || y >= height)
         return;
 
-    d_dst[dim]= d_dst[dim] > bin_thresh ? 255 : 0;
+    d_data[dim]= d_data[dim] > bin_thresh ? 255 : 0;
 }

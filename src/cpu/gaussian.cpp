@@ -31,12 +31,12 @@ static inline float* _generateKernel(int kernel_size, float sigma)
 
     return kernel;
 }
-void CPU::gaussian(unsigned char* & src, int width, int height, int kernel_size, float sigma)
+void CPU::gaussian(unsigned char* & data, int width, int height, int kernel_size, float sigma)
 {
     int offset = std::floor(kernel_size / 2);
 
-    float* kernel      = _generateKernel(kernel_size, sigma);
-    unsigned char* dst = new unsigned char[width * height];
+    float* kernel           = _generateKernel(kernel_size, sigma);
+    unsigned char* tmp_data = new unsigned char[width * height];
 
     for (int i = 0; i < width; i++)
     {
@@ -55,18 +55,18 @@ void CPU::gaussian(unsigned char* & src, int width, int height, int kernel_size,
                     int j_kernel = jj - j + offset;
 
                     float k_val   = kernel[i_kernel * kernel_size + j_kernel];
-                    float src_val = static_cast<float>(src[ii * height + jj]);
+                    float src_val = static_cast<float>(data[ii * height + jj]);
 
                     val += src_val * k_val;
                 }
             }
 
-            dst[i * height + j] = static_cast<unsigned char>(val);
+            tmp_data[i * height + j] = static_cast<unsigned char>(val);
         }
     }
 
-    std::swap(src, dst);
+    std::swap(data, tmp_data);
 
-    delete[] dst;
+    delete[] tmp_data;
     delete[] kernel;
 }
