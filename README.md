@@ -101,7 +101,7 @@ $ make pipeline
 To execute the program, from within the build folder:
 
 ```bash
-$ ./bin/pipeline --mode=[GPU,CPU] --config=CONFIG_PATH --folder=FRAMES_FOLDER
+$ ./bin/pipeline --mode=[GPU,CPU] --config=CONFIG_PATH --folder=FRAMES_FOLDER [--output=BBOX_OUTPUT]
 ```
 
 Once completed, a JSON file containing the bounding box coordinates for each frame will be outputted in the build directory, with the file name: `bbox.json`.
