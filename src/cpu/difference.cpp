@@ -2,11 +2,8 @@
 
 #include <cmath>
 
-void CPU::difference(unsigned char* dst, const unsigned char* src, const t_point& dim)
+void CPU::difference(unsigned char* dst, const unsigned char* src, int width, int height)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     for (int i = 0; i < width; i++)
     {
         for (int j = 0; j < height; j++)

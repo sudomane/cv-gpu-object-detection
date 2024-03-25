@@ -3,11 +3,8 @@
 #include <algorithm>
 #include <iostream>
 
-std::pair<t_point, t_point> CPU::getBbox(unsigned char* & src, const t_point& dim, int label)
+std::pair<t_point, t_point> CPU::getBbox(unsigned char* & src, int width, int height, int label)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     int top = height;
     int bot = 0;
 

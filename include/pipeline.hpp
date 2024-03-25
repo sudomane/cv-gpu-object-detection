@@ -19,11 +19,11 @@ inline void _exportJSON(json& json_data, const std::string& output = "bbox.json"
 namespace CPU
 {
     void runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
-                     const std::pair<int, int> &dim, const json& config);
+                     int width, int height, const json& config);
 }; // namespace CPU
 
 namespace GPU
 {
     void runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
-                     const std::pair<int, int> &dim, const json& config);
+                     int width, int height, const json& config);
 }; // namespace GPU

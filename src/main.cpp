@@ -74,10 +74,8 @@ static inline std::vector<std::pair<std::string, unsigned char*>> _getImages(con
     return images;
 }
 
-int main(int argc, char** argv)
+static inline cv::CommandLineParser _getParser(int argc, char** argv)
 {
-    int height, width;
-
     cv::CommandLineParser parser(
         argc, argv,
         "{mode   m|<none>| Device to run on, GPU or CPU.}"
@@ -87,6 +85,15 @@ int main(int argc, char** argv)
     );
 
     parser.about("Example usage: ./main --mode=GPU --config=CONFIG_PATH");
+
+    return parser;
+}
+
+int main(int argc, char** argv)
+{
+    int height, width;
+
+    auto parser = _getParser(argc, argv);
 
     if (parser.get<bool>("help"))
     {
@@ -106,24 +113,22 @@ int main(int argc, char** argv)
     std::vector<std::string> files = _getFiles();
     std::vector<std::pair<std::string, unsigned char*>> images = _getImages(files, height, width);
 
-    std::pair<int, int> dim = { width, height };
-
     json pipeline_config = _loadJson(json_config);
 
     if (device_mode == "CPU")
     {
         std::cout << "Running detection pipeline from CPU." << std::endl;
-        CPU::runPipeline(images, dim, pipeline_config);
+        CPU::runPipeline(images, width, height, pipeline_config);
     }
     else if (device_mode == "GPU")
     {
         std::cout << "Running detection pipeline from GPU." << std::endl;
-        GPU::runPipeline(images, dim, pipeline_config);
+        GPU::runPipeline(images, width, height, pipeline_config);
     }
 
     else
     {
-        std::cerr << "Invalid mode." << std::endl;
+        std::cerr << "Invalid mode. --mode=GPU | --mode=CPU" << std::endl;
         return -1;
     }
 

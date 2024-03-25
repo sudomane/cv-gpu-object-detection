@@ -5,11 +5,8 @@
 
 #include <iostream>
 
-static inline void _kernelFunc(unsigned char* & src, const t_point &dim, int kernel_size, bool is_dilation)
+static inline void _kernelFunc(unsigned char* & src, int width, int height, int kernel_size, bool is_dilation)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     unsigned char * dst = new unsigned char[width * height];
 
     for (int i = 0; i < width; i++)
@@ -47,17 +44,17 @@ static inline void _kernelFunc(unsigned char* & src, const t_point &dim, int ker
     delete[] dst;
 }
 
-void CPU::morphology(unsigned char* & src, const t_point & dim, int opening_size, int closing_size)
+void CPU::morphology(unsigned char* & src, int width, int height, int opening_size, int closing_size)
 {
     // Closing
     {
-        _kernelFunc(src, dim, closing_size, true);  // Dilation
-        _kernelFunc(src, dim, closing_size, false); // Erosion
+        _kernelFunc(src, width, height, closing_size, true);  // Dilation
+        _kernelFunc(src, width, height, closing_size, false); // Erosion
     }
 
     // Opening
     {
-        _kernelFunc(src, dim, opening_size, false); // Erosion
-        _kernelFunc(src, dim, opening_size, true);  // Dilation
+        _kernelFunc(src, width, height, opening_size, false); // Erosion
+        _kernelFunc(src, width, height, opening_size, true);  // Dilation
     }
 }

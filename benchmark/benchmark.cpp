@@ -15,7 +15,7 @@ static void BM_Grayscale(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::grayscale(dst, src, {width, height});
+        CPU::grayscale(dst, src, width, height);
     }
 
     delete[] src;
@@ -29,7 +29,7 @@ static void BM_Difference(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::difference(dst, src, {width, height});
+        CPU::difference(dst, src, width, height);
     }
 
     delete[] src;
@@ -45,7 +45,7 @@ static void BM_Gaussian(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::gaussian(src, {width, height}, kernel_size, sigma);
+        CPU::gaussian(src, width, height, kernel_size, sigma);
     }
 
     delete[] src;
@@ -60,7 +60,7 @@ static void BM_Morphology(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::morphology(src, {width, height}, opening_size, closing_size);
+        CPU::morphology(src, width, height, opening_size, closing_size);
     }
 
     delete[] src;
@@ -74,7 +74,7 @@ static void BM_Binary(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::binary(src, {width, height}, threshold);
+        CPU::binary(src, width, height, threshold);
     }
 
     delete[] src;
@@ -116,7 +116,7 @@ static void BM_Components(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::connectedComponents(src, {width, height});
+        CPU::connectedComponents(src, width, height);
     }
 
     delete[] src;
@@ -137,7 +137,7 @@ static void BM_BBox(benchmark::State& state)
 
     for (auto _ : state)
     {
-        CPU::getBbox(src, {width, height}, 1);
+        CPU::getBbox(src, width, height, 1);
     }
 
     delete[] src;

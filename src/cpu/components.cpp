@@ -8,11 +8,8 @@ static inline bool _checkBoundaries(int coord, int limit)
     return (coord >= limit || coord < 0);
 }
 
-static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, unsigned char label, int* count)
+static inline void _fillLabel(unsigned char* & src, int width, int height, int x, int y, unsigned char label, int* count)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     std::stack<t_point> stack;
 
     stack.push( {x, y} );
@@ -50,14 +47,11 @@ static inline void _fillLabel(unsigned char* & src, t_point dim, int x, int y, u
     }
 }
 
-std::vector<std::pair<int,int>> CPU::connectedComponents(unsigned char* &src, const t_point& dim)
+std::vector<t_point> CPU::connectedComponents(unsigned char* &src, int width, int height)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     unsigned char label = 0;
 
-    std::vector<std::pair<int, int>> label_histogram;
+    std::vector<t_point> label_histogram;
 
     for (int i = 0; i < width; i++)
     {
@@ -70,7 +64,7 @@ std::vector<std::pair<int,int>> CPU::connectedComponents(unsigned char* &src, co
 
             int n_label = 0;
 
-            _fillLabel(src, dim, i, j, label, &n_label);
+            _fillLabel(src, width, height, i, j, label, &n_label);
 
             label_histogram.push_back( {label, n_label} );
         }

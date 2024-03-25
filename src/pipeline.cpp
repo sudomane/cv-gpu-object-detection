@@ -4,20 +4,20 @@
 #include <CPU_ops.hpp>
 #include <opencv2/opencv.hpp>
 
-static inline unsigned char* _initRef(unsigned char* ref_image, const t_point& dim)
+static inline unsigned char* _initRef(unsigned char* ref_image, int width, int height)
 {
-    unsigned char* ref_gray  = new unsigned char[std::get<0>(dim) * std::get<1>(dim)];
-    CPU::grayscale(ref_gray, ref_image, dim);
+    unsigned char* ref_gray  = new unsigned char[width * height];
+    CPU::grayscale(ref_gray, ref_image, width, height);
 
     return ref_gray;
 }
 
-static inline int _getMaxLabel(std::vector<std::pair<int,int>> histogram)
+static inline int _getMaxLabel(std::vector<t_point> histogram)
 {
     int max   = 0;
     int label = 0;
 
-    for (const std::pair<int,int> & e : histogram)
+    for (const t_point & e : histogram)
     {
         int n_label = std::get<1>(e);
 
@@ -48,18 +48,15 @@ static inline void _addToJSON(json& json_data, const std::string& filename, cons
     json_data[filename] = {{x_min, y_min} , {x_max, y_max}};
 }
 
-static inline void _saveImage(const unsigned char* image_data, const t_point& dim, const std::string& filename)
+static inline void _saveImage(const unsigned char* image_data, int width, int height, const std::string& filename)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     cv::Mat image(width, height, CV_8UC1);
     memcpy(image.data, image_data, width * height * sizeof(unsigned char));
 
     cv::imwrite(filename, image);
 }
 
-void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim, const json& config)
+void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, int width, int height, const json& config)
 {
     json bbox_JSON_data;
 
@@ -69,10 +66,7 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int opening_size = config["opening_size"];
     int closing_size = config["closing_size"];
 
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
-    unsigned char* ref_image = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* ref_image = _initRef(std::get<1>(images[0]), width, height);
     unsigned char* h_buffer  = new unsigned char[width * height];
 
     for (int i = 1; i < images.size(); i++)
@@ -80,13 +74,13 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         const std::string filename = std::get<0>(images[i]);
         unsigned char* image       = std::get<1>(images[i]);
 
-        CPU::grayscale (h_buffer, image, dim);
-        CPU::difference(h_buffer, ref_image, dim);
-        CPU::gaussian  (h_buffer, dim, kernel_size, sigma);
-        CPU::morphology(h_buffer, dim, opening_size, closing_size);
-        CPU::binary    (h_buffer, dim, bin_thresh);
+        CPU::grayscale (h_buffer, image, width, height);
+        CPU::difference(h_buffer, ref_image, width, height);
+        CPU::gaussian  (h_buffer, width, height, kernel_size, sigma);
+        CPU::morphology(h_buffer, width, height, opening_size, closing_size);
+        CPU::binary    (h_buffer, width, height, bin_thresh);
 
-        auto histogram   = CPU::connectedComponents(h_buffer, dim);
+        auto histogram   = CPU::connectedComponents(h_buffer, width, height);
 
         int  max_label   = _getMaxLabel(histogram);
 
@@ -98,7 +92,7 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
             continue;
         }
 
-        const auto bbox_coords = CPU::getBbox(h_buffer, dim, max_label);
+        const auto bbox_coords = CPU::getBbox(h_buffer, width, height, max_label);
 
         _addToJSON(bbox_JSON_data, filename, bbox_coords);
     }

@@ -31,11 +31,8 @@ static inline float* _generateKernel(int kernel_size, float sigma)
 
     return kernel;
 }
-void CPU::gaussian(unsigned char* & src, const t_point& dim, int kernel_size, float sigma)
+void CPU::gaussian(unsigned char* & src, int width, int height, int kernel_size, float sigma)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     int offset = std::floor(kernel_size / 2);
 
     float* kernel      = _generateKernel(kernel_size, sigma);

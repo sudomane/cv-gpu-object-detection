@@ -24,14 +24,13 @@ inline std::tuple<int, int> _getBoundaries(int i, int kernel_size, int size)
 
 namespace CPU
 {
-    void grayscale (unsigned char* dst,  const unsigned char* src, const t_point& dim);
-    void difference(unsigned char* dst,  const unsigned char* src, const t_point& dim);
-    void gaussian  (unsigned char* & src, const t_point& dim, int kernel_size, float sigma);
-    void morphology(unsigned char* & src, const t_point& dim, int opening_size, int closing_size);
-    void binary    (unsigned char* & src, const t_point& dim, int bin_thresh);
+    void grayscale (unsigned char* dst,  const unsigned char* src, int width, int height);
+    void difference(unsigned char* dst,  const unsigned char* src, int width, int height);
+    void gaussian  (unsigned char* & src, int width, int height, int kernel_size, float sigma);
+    void morphology(unsigned char* & src, int width, int height, int opening_size, int closing_size);
+    void binary    (unsigned char* & src, int width, int height, int bin_thresh);
 
-    std::vector<std::pair<int,int>> connectedComponents(unsigned char* & src, const t_point& dim);
-
-    std::pair<t_point, t_point> getBbox(unsigned char* & src, const t_point& dim, int label);
+    std::vector<t_point> connectedComponents(unsigned char* & src, int width, int height);
+    std::pair<t_point, t_point> getBbox(unsigned char* & src, int width, int height, int label);
 
 }; // namespace cpu

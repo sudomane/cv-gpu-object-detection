@@ -4,11 +4,8 @@
 #include <GPU_ops.cuh>
 #include <opencv2/opencv.hpp>
 
-static inline void _saveImage(const unsigned char* d_image_data, const t_point& dim, const std::string& filename)
+static inline void _saveImage(const unsigned char* d_image_data, int width, int height, const std::string& filename)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     unsigned char* h_image_data = new unsigned char[width * height];
 
     int rc = cudaMemcpy(h_image_data, d_image_data, sizeof(unsigned char) * width * height, cudaMemcpyDeviceToHost);
@@ -24,11 +21,8 @@ static inline void _saveImage(const unsigned char* d_image_data, const t_point& 
     delete[] h_image_data;
 }
 
-static inline unsigned char* _initRef(unsigned char* h_ref_image, const t_point& dim)
+static inline unsigned char* _initRef(unsigned char* h_ref_image, int width, int height)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     int block_size = 256;
     int num_blocks = (width * height + block_size - 1) / block_size;
 
@@ -45,11 +39,8 @@ static inline unsigned char* _initRef(unsigned char* h_ref_image, const t_point&
 }
 
 void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
-                     const std::pair<int, int> &dim, const json& config)
+                     int width, int height, const json& config)
 {
-    int width  = std::get<0>(dim);
-    int height = std::get<1>(dim);
-
     int bin_thresh     = config["threshold"];
     int sigma          = config["sigma"];
     int kernel_size    = config["kernel_size"];
@@ -64,7 +55,7 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int num_blocks = (width * height + block_size - 1) / block_size;
 
     float* d_kernel             = _generateDeviceKernel(kernel_size, sigma);
-    unsigned char* d_ref        = _initRef(std::get<1>(images[0]), dim);
+    unsigned char* d_ref        = _initRef(std::get<1>(images[0]), width, height);
     unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_    = _cudaMalloc<unsigned char>(width * height);
