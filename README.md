@@ -93,7 +93,7 @@ This project requires OpenCV and CUDA, and must be installed on your system to b
 $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
-$ make main
+$ make # This will generate the binaries for
 ```
 
 ## Running the code
@@ -101,7 +101,7 @@ $ make main
 To execute the program, from within the build folder:
 
 ```bash
-$ ./main --mode=[GPU,CPU] --config=CONFIG_PATH
+$ ./bin/pipeline --mode=[GPU,CPU] --config=CONFIG_PATH --folder=FRAMES_FOLDER
 ```
 
 Once completed, a JSON file containing the bounding box coordinates for each frame will be outputted in the build directory, with the file name: `bbox.json`.
@@ -124,6 +124,6 @@ $ make bench_gpu # GPU Benchmarks
 To execute the benchmarks, from within the build folder:
 
 ```bash
-$ ./benchmark/bench     # CPU Benchmarks
-$ ./benchmark/bench_gpu # GPU Benchmarks
+$ ./bin/bench     # CPU Benchmarks
+$ ./bin/bench_gpu # GPU Benchmarks
 ```
