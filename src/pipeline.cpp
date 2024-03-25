@@ -1,13 +1,8 @@
 #include <pipeline.hpp>
 
-#include <iostream>
 #include <chrono>
-#include <fstream>
 #include <CPU_ops.hpp>
-#include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
-
-using json = nlohmann::json;
 
 static inline unsigned char* _initRef(unsigned char* ref_image, const t_point& dim)
 {
@@ -53,12 +48,6 @@ static inline void _addToJSON(json& json_data, const std::string& filename, cons
     json_data[filename] = {{x_min, y_min} , {x_max, y_max}};
 }
 
-static inline void _exportJSON(json& json_data)
-{
-    std::ofstream outputFile("bbox.json");
-    outputFile << json_data;
-}
-
 static inline void _saveImage(const unsigned char* image_data, const t_point& dim, const std::string& filename)
 {
     int width  = std::get<0>(dim);
@@ -70,17 +59,15 @@ static inline void _saveImage(const unsigned char* image_data, const t_point& di
     cv::imwrite(filename, image);
 }
 
-void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim)
+void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, const t_point& dim, const json& config)
 {
-    json json_data;
+    json bbox_JSON_data;
 
-    int sigma        = 10;
-    int kernel_size  = 21;
-    int opening_size = 21;
-    int closing_size = 21;
-
-    // implement adaptative thresholding
-    int bin_thresh   = 60;
+    int bin_thresh   = config["threshold"];
+    int sigma        = config["sigma"];
+    int kernel_size  = config["kernel_size"];
+    int opening_size = config["opening_size"];
+    int closing_size = config["closing_size"];
 
     int width  = std::get<0>(dim);
     int height = std::get<1>(dim);
@@ -103,20 +90,20 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
 
         int  max_label   = _getMaxLabel(histogram);
 
-        std::cout << "[CPU] : " << i << "/" << images.size()-1 << std::endl;
+        std::cout << "Processed frame " << i << " of " << images.size()-1 << std::endl;
 
         if (max_label == 0)
         {
-            _addToJSON(json_data, filename, {});
+            _addToJSON(bbox_JSON_data, filename, {});
             continue;
         }
 
         const auto bbox_coords = CPU::getBbox(h_buffer, dim, max_label);
 
-        _addToJSON(json_data, filename, bbox_coords);
+        _addToJSON(bbox_JSON_data, filename, bbox_coords);
     }
 
-    _exportJSON(json_data);
+    _exportJSON(bbox_JSON_data);
 
     delete[] h_buffer;
     delete[] ref_image;
