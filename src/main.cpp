@@ -84,7 +84,7 @@ static inline cv::CommandLineParser _getParser(int argc, char** argv)
         "{help   h|false | Show help message}"
     );
 
-    parser.about("Example usage: ./main --mode=GPU --config=CONFIG_PATH");
+    parser.about("Usage: ./main --mode=[GPU,CPU] --config=CONFIG_PATH");
 
     return parser;
 }
