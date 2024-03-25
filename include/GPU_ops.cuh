@@ -26,7 +26,7 @@ inline T* _cudaMalloc(size_t n)
 {
     T* d_out;
 
-    int rc = cudaMalloc(&d_out, sizeof(T) * n);
+    int rc = cudaMalloc((void**)(&d_out), sizeof(T) * n);
     if (rc)
       errx(1, "Failed to allocate d_out.");
 
