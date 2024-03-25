@@ -33,7 +33,7 @@ inline json _loadJson(const std::string& config_file)
     return j;
 }
 
-static inline std::vector<std::string> _getFiles(const std::string& path = "../data/rolling_hammer")
+static inline std::vector<std::string> _getFiles(const std::string& path)
 {
     std::cout << "Fetching frame data from " << path << std::endl;
 
@@ -80,6 +80,7 @@ static inline cv::CommandLineParser _getParser(int argc, char** argv)
         argc, argv,
         "{mode   m|<none>| Device to run on, GPU or CPU.}"
         "{config c|<none>| Path to JSON config file.}"
+        "{folder f|<none>| Path to folder containing ordered frames for detection. First frame will serve as the reference frame when detecting objects.}"
 
         "{help   h|false | Show help message}"
     );
@@ -103,6 +104,7 @@ int main(int argc, char** argv)
 
     std::string json_config = parser.get<std::string>("config");
     std::string device_mode = parser.get<std::string>("mode");
+    std::string folder_path = parser.get<std::string>("folder");
 
     if (json_config.empty())
     {
@@ -110,7 +112,13 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    std::vector<std::string> files = _getFiles();
+    if (folder_path.empty())
+    {
+        std::cerr << "Path to folder with frames required." << std::endl;
+        return -1;
+    }
+
+    std::vector<std::string> files = _getFiles(folder_path);
     std::vector<std::pair<std::string, unsigned char*>> images = _getImages(files, height, width);
 
     json pipeline_config = _loadJson(json_config);
