@@ -5,6 +5,8 @@ project(ObjDetect)
 find_package(OpenCV REQUIRED)
 find_package(benchmark REQUIRED)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_executable(bench
     benchmark.cpp
     utils.hpp
