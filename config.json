@@ -1,0 +1,9 @@
+{
+    "threshold"    : 60,
+
+    "sigma"        : 10,
+    "kernel_size"  : 21,
+
+    "opening_size" : 21,
+    "closing_size" : 21
+}
