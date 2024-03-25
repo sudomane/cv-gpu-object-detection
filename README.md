@@ -10,13 +10,13 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on 1920x1080 images, with the pipeline parameters from `config.json`.
 
-|            | CPU Time | GPU Time | % Speed Up  |
+|            | CPU Time | GPU Time | Speed gain  |
 |------------|----------|----------|-------------|
-|Grayscale   | 1.650 ms | 0.088 ms | 95 %        |
-|Difference  | 0.213 ms | 0.079 ms | 63 %        |
-|Gaussian    | 854 ms   | 34 ms    | 96 %        |
-|Morphology  | 5680 ms  | 130 ms   | 97 %        |
-|Binary      | 1.150 ms | 0.080 ms | 93 %        |
+|Grayscale   | 1.650 ms | 0.088 ms | x18.75      |
+|Difference  | 0.213 ms | 0.079 ms | x2.69       |
+|Gaussian    | 854 ms   | 34 ms    | x25.11      |
+|Morphology  | 5680 ms  | 130 ms   | x43.69      |
+|Binary      | 1.150 ms | 0.080 ms | x14.37      |
 |Components  | 1.690 ms |          |             |
 |Bounding box| 1.290 ms |          |             |
 |            |          |          |             |
