@@ -31,23 +31,6 @@ static inline int _getMaxLabel(std::vector<t_point> histogram)
     return label;
 }
 
-static inline void _addToJSON(json& json_data, const std::string& filename, const std::pair<t_point, t_point>& bbox_coords)
-{
-    if (bbox_coords == std::pair<t_point, t_point>())
-    {
-        json_data[filename] = json::array();
-        return;
-    }
-
-    int x_min = std::get<0>(std::get<0>(bbox_coords));
-    int x_max = std::get<1>(std::get<0>(bbox_coords));
-
-    int y_min = std::get<0>(std::get<1>(bbox_coords));
-    int y_max = std::get<1>(std::get<1>(bbox_coords));
-
-    json_data[filename] = {{x_min, y_min} , {x_max, y_max}};
-}
-
 static inline void _saveImage(const unsigned char* image_data, int width, int height, const std::string& filename)
 {
     cv::Mat image(width, height, CV_8UC1);
@@ -56,7 +39,7 @@ static inline void _saveImage(const unsigned char* image_data, int width, int he
     cv::imwrite(filename, image);
 }
 
-void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, int width, int height, const json& config)
+void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images, int width, int height, const json& config, const std::string& bbox_output)
 {
     json bbox_JSON_data;
 
@@ -81,7 +64,6 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         CPU::binary    (h_buffer, width, height, bin_thresh);
 
         auto histogram   = CPU::connectedComponents(h_buffer, width, height);
-
         int  max_label   = _getMaxLabel(histogram);
 
         std::cout << "Processed frame " << i << " of " << images.size()-1 << std::endl;
@@ -97,7 +79,7 @@ void CPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         _addToJSON(bbox_JSON_data, filename, bbox_coords);
     }
 
-    _exportJSON(bbox_JSON_data);
+    _exportJSON(bbox_JSON_data, bbox_output);
 
     delete[] h_buffer;
     delete[] ref_image;

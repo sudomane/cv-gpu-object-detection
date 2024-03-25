@@ -81,11 +81,12 @@ static inline cv::CommandLineParser _getParser(int argc, char** argv)
         "{mode   m|<none>| Device to run on, GPU or CPU.}"
         "{config c|<none>| Path to JSON config file.}"
         "{folder f|<none>| Path to folder containing ordered frames for detection. First frame will serve as the reference frame when detecting objects.}"
+        "{output o|bbox.json| Output destination for bounding box JSON file.}"
 
         "{help   h|false | Show help message}"
     );
 
-    parser.about("Usage: ./main --mode=[GPU,CPU] --config=CONFIG_PATH");
+    parser.about("Usage: ./main --mode=[GPU,CPU] --config=CONFIG_PATH --folder=FRAMES_FOLDER [--output=BBOX_OUTPUT]");
 
     return parser;
 }
@@ -105,6 +106,7 @@ int main(int argc, char** argv)
     std::string json_config = parser.get<std::string>("config");
     std::string device_mode = parser.get<std::string>("mode");
     std::string folder_path = parser.get<std::string>("folder");
+    std::string bbox_output = parser.get<std::string>("output");
 
     if (json_config.empty())
     {
@@ -126,12 +128,12 @@ int main(int argc, char** argv)
     if (device_mode == "CPU")
     {
         std::cout << "Running detection pipeline from CPU." << std::endl;
-        CPU::runPipeline(images, width, height, pipeline_config);
+        CPU::runPipeline(images, width, height, pipeline_config, bbox_output);
     }
     else if (device_mode == "GPU")
     {
         std::cout << "Running detection pipeline from GPU." << std::endl;
-        GPU::runPipeline(images, width, height, pipeline_config);
+        GPU::runPipeline(images, width, height, pipeline_config, bbox_output);
     }
 
     else

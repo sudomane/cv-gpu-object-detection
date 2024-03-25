@@ -39,8 +39,10 @@ static inline unsigned char* _initRef(unsigned char* h_ref_image, int width, int
 }
 
 void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& images,
-                     int width, int height, const json& config)
+                     int width, int height, const json& config, const std::string& bbox_output)
 {
+    json bbox_JSON_data;
+
     int bin_thresh     = config["threshold"];
     int sigma          = config["sigma"];
     int kernel_size    = config["kernel_size"];
@@ -76,7 +78,11 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         std::cout << "Processed frame " << i << " of " << images.size()-1 << std::endl;
 
         cudaFree(d_image);
+
+        _addToJSON(bbox_JSON_data, filename, {});
     }
+
+    _exportJSON(bbox_JSON_data, bbox_output);
 
     cudaFree(d_buffer);
     cudaFree(d_buffer_tmp);

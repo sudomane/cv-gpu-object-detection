@@ -93,7 +93,7 @@ This project requires OpenCV and CUDA, and must be installed on your system to b
 $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
-$ make # This will generate the binaries for
+$ make pipeline
 ```
 
 ## Running the code
