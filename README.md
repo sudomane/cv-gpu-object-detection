@@ -8,7 +8,7 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 ## Benchmarks
 
-Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on an NVIDIA GeForce GTX 1650, with 4GB of VRAM. The images are of size 1920x1080, and the pipeline parameters can be found in `config.json`.
+Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on an NVIDIA GeForce GTX 1650, with 4GB of VRAM. The synthetic images are of size 1920x1080, and the pipeline parameters can be found in `config.json`.
 
 |            | CPU Time | GPU Time | Speed gain  |
 |------------|----------|----------|-------------|
@@ -68,10 +68,10 @@ $ git clone --recurse-submodules git@github.com:sudomane/cv-gpu-object-detection
 Or alternatively,
 
 ```bash
-$git clone git@github.com:sudomane/cv-gpu-object-detection.git
-$cd cv-gpu-object-detection
-$git submodule init   # Create submodule configuration file
-$git submodule update # Fetch submodule data
+$ git clone git@github.com:sudomane/cv-gpu-object-detection.git
+$ cd cv-gpu-object-detection
+$ git submodule init   # Create submodule configuration file
+$ git submodule update # Fetch submodule data
 ```
 
 ## Setting up the Python Environment
@@ -101,7 +101,7 @@ $ make main
 To execute the program, from within the build folder:
 
 ```bash
-$ ./src/main
+$ ./main --mode=[GPU,CPU] --config=CONFIG_PATH
 ```
 
 Once completed, a JSON file containing the bounding box coordinates for each frame will be outputted in the build directory, with the file name: `bbox.json`.
