@@ -8,7 +8,7 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 ## Benchmarks
 
-Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on an NVIDIA GeForce GTX 1650, 4GB of VRAM. The images are of size 1920x1080, and the pipeline parameters can be found in `config.json`.
+Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on an NVIDIA GeForce GTX 1650, with 4GB of VRAM. The images are of size 1920x1080, and the pipeline parameters can be found in `config.json`.
 
 |            | CPU Time | GPU Time | Speed gain  |
 |------------|----------|----------|-------------|
