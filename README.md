@@ -8,7 +8,7 @@ The aim of this project is to implement an object detection pipeline in C++ and 
 
 ## Benchmarks
 
-Here are the benchmarks on individual  that I have obtained with my CPU vs GPU implementation.
+Here are the benchmarks on individual that I have obtained with my CPU vs GPU implementation. The tests were conducted on 1920x1080 images, with the pipeline parameters from `config.json`.
 
 |            | CPU Time | GPU Time | % Speed Up  |
 |------------|----------|----------|-------------|
