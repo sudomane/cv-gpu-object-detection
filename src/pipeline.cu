@@ -57,11 +57,11 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int num_blocks = (width * height + block_size - 1) / block_size;
 
     float* d_kernel             = _generateDeviceKernel(kernel_size, sigma);
+    int*   d_CC_labels          = _cudaMalloc<int>(width * height);
     unsigned char* d_ref        = _initRef(std::get<1>(images[0]), width, height);
     unsigned char* d_buffer     = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_alt = _cudaMalloc<unsigned char>(width * height); // Additional temporary buffer
-    unsigned char* d_CC_labels  = _cudaMalloc<unsigned char>(width * height); // Buffer for connected component labels
 
     for (int i = 1; i < images.size(); i++)
     {
@@ -69,12 +69,13 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
         unsigned char* h_image     = std::get<1>(images[i]);
         unsigned char* d_image     = _toDevice<unsigned char>(h_image, width, height, 3);
 
-        GPU::grayscale <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
-        GPU::difference<<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
-        GPU::gaussian  <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel, width, height, kernel_size, kernel_offset);
-        GPU::morphology<<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, d_buffer_alt, width, height, opening_size, closing_size, opening_offset, closing_offset);
-        GPU::binary    <<<num_blocks, block_size>>>(d_buffer, bin_thresh, width, height);
-        GPU::components<<<num_blocks, block_size>>>(d_buffer, d_CC_labels, width, height);
+        GPU::grayscale  <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
+        GPU::difference <<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
+        GPU::gaussian   <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel, width, height, kernel_size, kernel_offset);
+        GPU::morphology <<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, d_buffer_alt, width, height, opening_size, closing_size, opening_offset, closing_offset);
+        GPU::binary     <<<num_blocks, block_size>>>(d_buffer, bin_thresh, width, height);
+        GPU::initLabelCC<<<num_blocks, block_size>>>(d_CC_labels, width, height);
+        GPU::components <<<num_blocks, block_size>>>(d_buffer, d_CC_labels, width, height);
 
         _saveImage(d_buffer, width, height, "out.png");
 
