@@ -86,7 +86,54 @@ namespace GPU
     __global__ void gaussian   (unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel, int width, int height, int kernel_size, int offset);
     __global__ void morphology (unsigned char* d_dst, unsigned char* d_src, unsigned char* d_buf, int width, int height, int opening_size, int closing_size, int opening_offset, int closing_offset);
     __global__ void binary     (unsigned char* d_data, int bin_thresh, int width, int height);
-    __global__ void initLabelCC(int* d_label, int width, int height);
-    __global__ void components (unsigned char* d_data, int* d_labels, int width, int height);
-    __global__ void getBbox    (unsigned char* d_data, int* coords, int width, int height, int label);
+    __global__ void initLabelCC(int* d_labels, int width, int height);
+    __global__ void components (int* d_labels, int width, int height);
+    __global__ void getBbox    (int* d_labels, int* coords, int width, int height, int label);
+
+    class HostWrapper
+    {
+    public:
+        HostWrapper(int width, int height, int kernel_size, int opening_size, int closing_size, int bin_thresh, int block_size = 256)
+        {
+            this->width  = width;
+            this->height = height;
+
+            this->block_size = block_size;
+            this->num_blocks = (width * height + this->block_size - 1) / this->block_size;
+
+            this->closing_size = closing_size;
+            this->kernel_size  = kernel_size;
+            this->opening_size = opening_size;
+            this->bin_thresh   = bin_thresh;
+
+            this->kernel_offset  = std::floor(kernel_size/2);
+            this->opening_offset = std::floor(opening_size/2);
+            this->closing_offset = std::floor(closing_size/2);
+        };
+
+        void grayscale  (unsigned char* d_dst, const unsigned char* d_src);
+        void difference (unsigned char* d_dst, const unsigned char* d_src);
+        void gaussian   (unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel);
+        void morphology (unsigned char* d_dst, unsigned char* d_src, unsigned char* d_buf);
+        void binary     (unsigned char* d_data);
+        void initLabelCC(int* d_labels);
+        void components (int* d_labels);
+        void getBbox    (int* d_labels, int* coords, int label);
+
+    private:
+        int width;
+        int height;
+        int block_size;
+        int num_blocks;
+
+        int bin_thresh;
+        int kernel_size;
+        int opening_size;
+        int closing_size;
+
+        int kernel_offset;
+        int opening_offset;
+        int closing_offset;
+    };// namespace wrapper
+
 }; // namespace gpu

@@ -14,7 +14,6 @@ inline void _exportJSON(json& json_data, const std::string& output = "bbox.json"
     std::cout << "Exporting JSON with bounding box data to: " << output << std::endl;
     std::ofstream outputFile(output);
     outputFile << json_data;
-    //json_data.dump();
 }
 
 inline void _addToJSON(json& json_data, const std::string& filename, const std::pair<std::pair<int,int>, std::pair<int,int>>& bbox_coords)

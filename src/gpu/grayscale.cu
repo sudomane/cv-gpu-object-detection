@@ -16,3 +16,16 @@ __global__ void GPU::grayscale(unsigned char* d_dst, const unsigned char* d_src,
 
     d_dst[dim] = static_cast<unsigned char>((r + g + b) / 3);
 }
+
+
+void GPU::HostWrapper::grayscale(unsigned char* d_dst, const unsigned char* d_src)
+{
+    GPU::grayscale<<<num_blocks, block_size>>>(d_dst, d_src, this->width, this->height);
+
+    cudaDeviceSynchronize();
+
+    cudaError_t error = cudaPeekAtLastError();
+
+    if (error != cudaSuccess)
+        errx(1, "[grayscale] CUDA Error: %s\n", cudaGetErrorString(error));
+}

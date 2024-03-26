@@ -49,13 +49,6 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     int opening_size   = config["opening_size"];
     int closing_size   = config["closing_size"];
 
-    int kernel_offset  = std::floor(kernel_size  / 2);
-    int opening_offset = std::floor(opening_size / 2);
-    int closing_offset = std::floor(closing_size / 2);
-
-    int block_size = 256;
-    int num_blocks = (width * height + block_size - 1) / block_size;
-
     float* d_kernel             = _generateDeviceKernel(kernel_size, sigma);
     int*   d_CC_labels          = _cudaMalloc<int>(width * height);
     unsigned char* d_ref        = _initRef(std::get<1>(images[0]), width, height);
@@ -63,21 +56,23 @@ void GPU::runPipeline(std::vector<std::pair<std::string, unsigned char*>>& image
     unsigned char* d_buffer_tmp = _cudaMalloc<unsigned char>(width * height);
     unsigned char* d_buffer_alt = _cudaMalloc<unsigned char>(width * height); // Additional temporary buffer
 
+    GPU::HostWrapper wrapper(width, height, kernel_size, opening_size, closing_size, bin_thresh);
+
     for (int i = 1; i < images.size(); i++)
     {
         const std::string filename = std::get<0>(images[i]);
         unsigned char* h_image     = std::get<1>(images[i]);
         unsigned char* d_image     = _toDevice<unsigned char>(h_image, width, height, 3);
 
-        GPU::grayscale  <<<num_blocks, block_size>>>(d_buffer, d_image, width, height);
-        GPU::difference <<<num_blocks, block_size>>>(d_buffer, d_ref, width, height);
-        GPU::gaussian   <<<num_blocks, block_size>>>(d_buffer_tmp, d_buffer, d_kernel, width, height, kernel_size, kernel_offset);
-        GPU::morphology <<<num_blocks, block_size>>>(d_buffer, d_buffer_tmp, d_buffer_alt, width, height, opening_size, closing_size, opening_offset, closing_offset);
-        GPU::binary     <<<num_blocks, block_size>>>(d_buffer, bin_thresh, width, height);
-        GPU::initLabelCC<<<num_blocks, block_size>>>(d_CC_labels, width, height);
-        GPU::components <<<num_blocks, block_size>>>(d_buffer, d_CC_labels, width, height);
+        wrapper.grayscale  (d_buffer, d_image);
+        wrapper.difference (d_buffer, d_ref);
+        wrapper.gaussian   (d_buffer_tmp, d_buffer, d_kernel);
+        wrapper.morphology (d_buffer, d_buffer_tmp, d_buffer_alt);
+        wrapper.binary     (d_buffer);
+        wrapper.initLabelCC(d_CC_labels);
+        wrapper.components (d_CC_labels);
 
-        _saveImage(d_buffer, width, height, "out.png");
+        //_saveImage(d_buffer, width, height, "out"+std::to_string(i)+".png");
 
         std::cout << "Processed frame " << i << " of " << images.size()-1 << std::endl;
 

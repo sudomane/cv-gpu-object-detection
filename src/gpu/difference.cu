@@ -14,3 +14,15 @@ __global__ void GPU::difference(unsigned char* d_dst, const unsigned char* d_src
 
     d_dst[dim] = abs(d_src[dim] - d_dst[dim]);
 }
+
+void GPU::HostWrapper::difference(unsigned char* d_dst, const unsigned char* d_src)
+{
+    GPU::difference<<<this->num_blocks, this->block_size>>>(d_dst, d_src, this->width, this->height);
+
+    cudaDeviceSynchronize();
+
+    cudaError_t error = cudaPeekAtLastError();
+
+    if (error != cudaSuccess)
+        errx(1, "[difference] CUDA Error: %s\n", cudaGetErrorString(error));
+}

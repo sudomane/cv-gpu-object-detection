@@ -34,3 +34,19 @@ __global__ void GPU::gaussian(unsigned char* d_dst, const unsigned char* d_src, 
 
     d_dst[x * height + y] = static_cast<unsigned char>(val);
 }
+
+void GPU::HostWrapper::gaussian(unsigned char* d_dst, const unsigned char* d_src, const float* d_kernel)
+{
+    GPU::gaussian<<<this->num_blocks, this->block_size>>>(d_dst, d_src, d_kernel,
+                                                          this->width,
+                                                          this->height,
+                                                          this->kernel_size,
+                                                          this->kernel_offset);
+
+    cudaDeviceSynchronize();
+
+    cudaError_t error = cudaPeekAtLastError();
+
+    if (error != cudaSuccess)
+        errx(1, "[gaussian] CUDA Error: %s\n", cudaGetErrorString(error));
+}
